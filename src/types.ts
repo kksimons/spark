@@ -26,11 +26,27 @@ export interface Session {
   messages?: Message[];
 }
 
-export type PersonaStatus = "idle" | "thinking" | "speaking" | "done";
+export type AgentPhase =
+  | "entering"
+  | "thinking"
+  | "responded"
+  | "questioning"
+  | "waiting"
+  | "followup"
+  | "done";
 
-export interface PersonaState {
-  status: PersonaStatus;
-  messages: { round: number; content: string }[];
+export interface AgentState {
+  personaId: string;
+  phase: AgentPhase;
+  assessment: string | null;
+  question: string | null;
+  followup: string | null;
+  userAnswer: string | null;
+}
+
+export interface DiscussionMsg {
+  personaId: string;
+  content: string;
 }
 
 export interface SSEEvent {
@@ -38,6 +54,5 @@ export interface SSEEvent {
   persona?: string;
   round?: number;
   content?: string;
-  summary?: string;
   status?: string;
 }

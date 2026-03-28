@@ -12,6 +12,13 @@ export interface Persona {
   systemPrompt: string;
 }
 
+const QUESTION_INSTRUCTION = `
+
+If the idea is vague or you need more information to give a thorough assessment, you may ask ONE clarifying question. Place it at the very end of your response on its own line starting with "QUESTION_FOR_USER:" — for example:
+QUESTION_FOR_USER: Could you tell me more about who the primary users would be?
+
+Only ask if it would meaningfully improve your assessment. Keep your main assessment concise (under 250 words).`;
+
 export const personas: Persona[] = [
   {
     id: "dayee",
@@ -34,10 +41,10 @@ When evaluating an idea, be specific about:
 2. Data sensitivity classification and handling
 3. Network security considerations
 4. Specific Azure security services that should be used
-5. Compliance checkboxes that must be satisfied
+5. Compliance requirements that must be satisfied
 6. Risk rating (Low / Medium / High / Critical)
 
-Be conversational but thorough. Keep responses focused and under 300 words. Use plain language accessible to non-technical stakeholders.`,
+Be conversational but thorough. Use plain language accessible to non-technical stakeholders. You should ask one clarifying question about the security/data sensitivity aspects of the proposed idea.${QUESTION_INSTRUCTION}`,
   },
   {
     id: "nathan",
@@ -64,7 +71,7 @@ When evaluating an idea, be specific about:
 5. Monitoring and observability setup
 6. Timeline estimate for infrastructure provisioning
 
-Be conversational but thorough. Keep responses focused and under 300 words. Use plain language accessible to non-technical stakeholders.`,
+Be conversational but thorough. Use plain language accessible to non-technical stakeholders.${QUESTION_INSTRUCTION}`,
   },
   {
     id: "dana",
@@ -90,7 +97,7 @@ When evaluating an idea, be specific about:
 5. Data architecture considerations
 6. Licensing impact assessment
 
-Be conversational but thorough. Keep responses focused and under 300 words. Use plain language accessible to non-technical stakeholders.`,
+Be conversational but thorough. Use plain language accessible to non-technical stakeholders.${QUESTION_INSTRUCTION}`,
   },
   {
     id: "lalindra",
@@ -116,7 +123,7 @@ When evaluating an idea, be specific about:
 5. UI framework / design system recommendation
 6. Potential UX pitfalls to watch for
 
-Be conversational but thorough. Keep responses focused and under 300 words. Use plain language accessible to non-technical stakeholders.`,
+Be conversational but thorough. Use plain language accessible to non-technical stakeholders. You should ask one clarifying question about who the intended users are and how they would interact with the product.${QUESTION_INSTRUCTION}`,
   },
   {
     id: "kyle",
@@ -142,18 +149,60 @@ When evaluating an idea, be specific about:
 5. Estimated development effort (t-shirt sizing: S/M/L/XL)
 6. Suggested phased delivery approach
 
-Be conversational but thorough. Keep responses focused and under 300 words. Use plain language accessible to non-technical stakeholders.`,
+Be conversational but thorough. Use plain language accessible to non-technical stakeholders.${QUESTION_INSTRUCTION}`,
   },
 ];
 
-export type SSECallback = (event: {
-  type: string;
-  persona?: string;
-  round?: number;
-  content?: string;
-  summary?: string;
-  status?: string;
-}) => void;
+export type SSECallback = (event: Record<string, unknown>) => void;
+
+// In-memory store for pending user answers
+const pendingAnswers = new Map<
+  string,
+  { resolve: (answer: string) => void }
+>();
+
+export function submitAnswer(sessionId: string, answer: string): boolean {
+  const pending = pendingAnswers.get(sessionId);
+  if (pending) {
+    pending.resolve(answer);
+    pendingAnswers.delete(sessionId);
+    return true;
+  }
+  return false;
+}
+
+function waitForAnswer(sessionId: string, timeoutMs = 300_000): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      pendingAnswers.delete(sessionId);
+      reject(new Error("Timed out waiting for user answer"));
+    }, timeoutMs);
+
+    pendingAnswers.set(sessionId, {
+      resolve: (answer: string) => {
+        clearTimeout(timer);
+        resolve(answer);
+      },
+    });
+  });
+}
+
+function parseResponse(content: string): {
+  assessment: string;
+  question: string | null;
+} {
+  const match = content.match(/QUESTION_FOR_USER:\s*(.+?)$/ms);
+  if (match) {
+    const question = match[1].trim();
+    const assessment = content.slice(0, match.index).trim();
+    return { assessment, question };
+  }
+  return { assessment: content.trim(), question: null };
+}
+
+function delay(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
 
 async function callOpenRouter(
   systemPrompt: string,
@@ -200,62 +249,112 @@ export async function runEvaluation(
   onEvent: SSECallback
 ) {
   try {
-    // Round 1: Initial individual assessments (parallel)
+    const agentResults: Record<string, string> = {};
+
+    // ── Round 1: Sequential individual assessments ──
     onEvent({ type: "round_start", round: 1 });
 
-    const round1Promises = personas.map(async (persona) => {
-      onEvent({
-        type: "persona_thinking",
-        persona: persona.id,
-        round: 1,
-      });
+    for (let i = 0; i < personas.length; i++) {
+      const persona = personas[i];
+
+      // Signal the card should enter
+      onEvent({ type: "agent_enter", persona: persona.id });
+      await delay(800);
+
+      // Thinking
+      onEvent({ type: "agent_thinking", persona: persona.id });
 
       const prompt = `A colleague at ENMAX has proposed the following idea:\n\n"${idea}"\n\nPlease evaluate this idea from your perspective as ${persona.role} in ${persona.department}. What are the key considerations, recommendations, and potential concerns?`;
 
-      const content = await callOpenRouter(persona.systemPrompt, prompt, apiKey);
+      const rawContent = await callOpenRouter(
+        persona.systemPrompt,
+        prompt,
+        apiKey
+      );
+      const { assessment, question } = parseResponse(rawContent);
 
+      // Send the assessment (card flip)
+      onEvent({
+        type: "agent_response",
+        persona: persona.id,
+        round: 1,
+        content: assessment,
+      });
+
+      // If the agent has a question, pause for user input
+      if (question) {
+        await delay(600);
+        onEvent({
+          type: "agent_question",
+          persona: persona.id,
+          content: question,
+        });
+
+        // Wait for user to answer
+        const userAnswer = await waitForAnswer(sessionId);
+
+        onEvent({
+          type: "user_answer",
+          persona: persona.id,
+          content: userAnswer,
+        });
+
+        // Get a refined take with the answer
+        onEvent({ type: "agent_thinking", persona: persona.id });
+
+        const followUpContent = await callOpenRouter(
+          persona.systemPrompt,
+          `${prompt}\n\nYou previously asked: "${question}"\nThe user responded: "${userAnswer}"\n\nGive a brief updated take (2-3 sentences max) incorporating this new information. Do NOT ask another question.`,
+          apiKey
+        );
+
+        onEvent({
+          type: "agent_followup",
+          persona: persona.id,
+          content: followUpContent.trim(),
+        });
+
+        agentResults[persona.id] = `${assessment}\n\n[After clarification]: ${followUpContent.trim()}`;
+      } else {
+        agentResults[persona.id] = assessment;
+      }
+
+      // Persist
       insertMessage.run(
         nanoid(),
         sessionId,
         persona.id,
         1,
-        content,
+        agentResults[persona.id],
         "complete"
       );
 
-      onEvent({
-        type: "persona_response",
-        persona: persona.id,
-        round: 1,
-        content,
-      });
+      onEvent({ type: "agent_done", persona: persona.id });
+      await delay(600);
+    }
 
-      return { persona: persona.id, content };
-    });
-
-    const round1Results = await Promise.all(round1Promises);
     onEvent({ type: "round_complete", round: 1 });
 
-    // Round 2: Cross-discussion (parallel, but with context from round 1)
+    // ── Round 2: Cross-discussion ──
     onEvent({ type: "round_start", round: 2 });
+    await delay(400);
 
-    const round1Summary = round1Results
-      .map((r) => {
-        const p = personas.find((p) => p.id === r.persona)!;
-        return `**${p.name} (${p.department}):** ${r.content}`;
-      })
+    const round1Summary = personas
+      .map((p) => `**${p.name} (${p.department}):** ${agentResults[p.id]}`)
       .join("\n\n---\n\n");
 
-    const round2Promises = personas.map(async (persona) => {
-      onEvent({
-        type: "persona_thinking",
-        persona: persona.id,
-        round: 2,
-      });
+    // Run discussion in parallel but emit sequentially for animation
+    const discussionPromises = personas.map(async (persona) => {
+      const prompt = `A colleague at ENMAX proposed this idea:\n\n"${idea}"\n\nHere are the initial assessments from all department specialists:\n\n${round1Summary}\n\nReview your colleagues' assessments. Do you agree or disagree with any points? Are there cross-cutting concerns? Highlight only the most important cross-department insights. Keep it brief — 2-3 sentences max, like a quick comment in a meeting. Do NOT ask any questions.`;
 
-      const prompt = `A colleague at ENMAX proposed this idea:\n\n"${idea}"\n\nHere are the initial assessments from all department specialists:\n\n${round1Summary}\n\nNow, review your colleagues' assessments. Do you agree or disagree with any points? Are there cross-cutting concerns between departments? What additional considerations arise from seeing everyone's perspective? Keep your response brief and focused — highlight only the most important cross-department insights (under 200 words).`;
+      return callOpenRouter(persona.systemPrompt, prompt, apiKey);
+    });
 
-      const content = await callOpenRouter(persona.systemPrompt, prompt, apiKey);
+    const discussionResults = await Promise.all(discussionPromises);
+
+    for (let i = 0; i < personas.length; i++) {
+      const persona = personas[i];
+      const content = discussionResults[i].trim();
 
       insertMessage.run(
         nanoid(),
@@ -267,57 +366,48 @@ export async function runEvaluation(
       );
 
       onEvent({
-        type: "persona_response",
+        type: "discussion_message",
         persona: persona.id,
         round: 2,
         content,
       });
 
-      return { persona: persona.id, content };
-    });
+      await delay(300);
+    }
 
-    const round2Results = await Promise.all(round2Promises);
     onEvent({ type: "round_complete", round: 2 });
 
-    // Round 3: Synthesis
+    // ── Round 3: Synthesis ──
     onEvent({ type: "round_start", round: 3 });
-    onEvent({ type: "persona_thinking", persona: "orchestrator", round: 3 });
+    onEvent({ type: "synthesis_thinking" });
 
-    const round2Summary = round2Results
-      .map((r) => {
-        const p = personas.find((p) => p.id === r.persona)!;
-        return `**${p.name} (${p.department}):** ${r.content}`;
-      })
-      .join("\n\n---\n\n");
+    const round2Summary = personas
+      .map((p, i) => `**${p.name} (${p.department}):** ${discussionResults[i]}`)
+      .join("\n\n");
 
-    const synthesisPrompt = `You are the ENMAX Spark Orchestrator. Your job is to synthesize a team evaluation into a clear, actionable plan.
+    const synthesisPrompt = `You are the ENMAX Spark Orchestrator. Synthesize this team evaluation into a clear, actionable plan.
 
-An ENMAX employee proposed this idea:
+The idea: "${idea}"
 
-"${idea}"
-
-Here are the Round 1 individual assessments:
-
+Individual assessments:
 ${round1Summary}
 
-Here are the Round 2 cross-discussion insights:
-
+Cross-discussion:
 ${round2Summary}
 
-Please create a final synthesis that includes:
-
-1. **Verdict** — Is this idea feasible and worth pursuing? (Go / Go with Conditions / Needs More Research / Not Recommended)
-2. **Executive Summary** — 2-3 sentence overview
-3. **Departments Involved** — Which teams need to participate and their key responsibilities
-4. **Recommended Approach** — Phased plan with clear milestones
-5. **Key Risks & Mitigations** — Top 3-5 risks and how to address them
+Create a final synthesis with:
+1. **Verdict** — Go / Go with Conditions / Needs More Research / Not Recommended
+2. **Executive Summary** — 2-3 sentences
+3. **Departments Involved** — Teams and their responsibilities
+4. **Recommended Approach** — Phased plan with milestones
+5. **Key Risks & Mitigations** — Top 3-5 risks
 6. **Estimated Effort & Cost** — High-level sizing
-7. **Immediate Next Steps** — What should happen in the next 2 weeks
+7. **Immediate Next Steps** — Next 2 weeks
 
-Format this clearly with markdown headers. Be decisive and actionable.`;
+Format with markdown headers. Be decisive and actionable.`;
 
     const synthesis = await callOpenRouter(
-      "You are a strategic technology advisor synthesizing expert evaluations into clear, actionable plans for non-technical stakeholders.",
+      "You are a strategic technology advisor at ENMAX synthesizing expert evaluations into clear, actionable plans for non-technical stakeholders.",
       synthesisPrompt,
       apiKey
     );
@@ -333,12 +423,7 @@ Format this clearly with markdown headers. Be decisive and actionable.`;
 
     updateSession.run("complete", synthesis, sessionId);
 
-    onEvent({
-      type: "synthesis",
-      round: 3,
-      content: synthesis,
-    });
-
+    onEvent({ type: "synthesis", round: 3, content: synthesis });
     onEvent({ type: "round_complete", round: 3 });
     onEvent({ type: "evaluation_complete", status: "complete" });
   } catch (error) {

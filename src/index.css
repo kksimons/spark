@@ -2,29 +2,27 @@
 @plugin "tailwindcss-animate";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-background: #fafafa;
-  --color-foreground: #0a0a0a;
-  --color-muted: #f0f0f0;
-  --color-muted-foreground: #737373;
-  --color-border: #e5e5e5;
-  --color-ring: #3d9b8f;
+  --color-background: #f7f7f7;
+  --color-foreground: #111111;
+  --color-muted: #eeeeee;
+  --color-muted-foreground: #6b6b6b;
+  --color-border: #e0e0e0;
   --color-card: #ffffff;
-  --color-card-foreground: #0a0a0a;
-  --color-primary: #0a0a0a;
+  --color-card-foreground: #111111;
+  --color-primary: #111111;
   --color-primary-foreground: #fafafa;
   --color-accent: #3d9b8f;
-  --color-accent-light: #e8f5f2;
   --color-accent-foreground: #ffffff;
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
   --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
 
   --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
+  --animate-float: float 3s ease-in-out infinite;
 }
 
 @keyframes pulse-soft {
@@ -32,11 +30,13 @@
   50% { opacity: 0.5; }
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-sans);
@@ -44,9 +44,40 @@ body {
   color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.011em;
+  line-height: 1.5;
 }
 
-::-webkit-scrollbar { width: 6px; }
+/* Fine-tune Inter's optical sizing */
+h1, h2, h3, h4 {
+  letter-spacing: -0.025em;
+  font-feature-settings: "ss01", "ss02", "cv01";
+}
+
+/* Textarea + input type refinement */
+textarea, input {
+  font-family: var(--font-sans);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  letter-spacing: -0.006em;
+}
+
+textarea::placeholder, input::placeholder {
+  letter-spacing: 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #a3a3a3; }
+
+/* 3D perspective */
+.perspective { perspective: 1200px; }
+
+/* Prose refinements for agent cards */
+.prose { letter-spacing: -0.006em; }
+.prose h1, .prose h2, .prose h3 { letter-spacing: -0.02em; }
+.prose li { line-height: 1.6; }
+.prose p { line-height: 1.65; }
+.prose strong { font-weight: 600; }

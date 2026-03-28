@@ -1,9 +1,9 @@
-import { useState, useCallback } from "react";
-import type { Session, Persona, PersonaState, SSEEvent } from "./types";
+import { useState, useCallback, useRef } from "react";
+import type { Session, Persona, AgentState, DiscussionMsg, SSEEvent } from "./types";
 import { Header } from "./components/Header";
 import { LandingInput } from "./components/LandingInput";
 import { EvaluationView } from "./components/EvaluationView";
-import { SessionSidebar } from "./components/SessionSidebar";
+import { CollapsibleSidebar } from "./components/CollapsibleSidebar";
 
 export const PERSONAS: Persona[] = [
   { id: "dayee", name: "Dayee", department: "Cybersecurity", role: "Security Analyst", icon: "shield", avatar: "/dayee.png" },
@@ -13,57 +13,92 @@ export const PERSONAS: Persona[] = [
   { id: "kyle", name: "Kyle", department: "Engineering", role: "Software Engineer", icon: "code", avatar: "/kyle.png" },
 ];
 
-function initPersonaStates(): Record<string, PersonaState> {
-  const states: Record<string, PersonaState> = {};
-  for (const p of PERSONAS) {
-    states[p.id] = { status: "idle", messages: [] };
-  }
-  return states;
-}
+const personaMap = Object.fromEntries(PERSONAS.map((p) => [p.id, p]));
 
 export default function App() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSession, setActiveSession] = useState<Session | null>(null);
-  const [personaStates, setPersonaStates] = useState<Record<string, PersonaState>>(initPersonaStates());
-  const [currentRound, setCurrentRound] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Evaluation state
+  const [completedAgents, setCompletedAgents] = useState<AgentState[]>([]);
+  const [activeAgent, setActiveAgent] = useState<AgentState | null>(null);
+  const [discussionMsgs, setDiscussionMsgs] = useState<DiscussionMsg[]>([]);
   const [synthesis, setSynthesis] = useState<string | null>(null);
-  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [phase, setPhase] = useState<"idle" | "agents" | "discussion" | "synthesis" | "complete">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [isReplay, setIsReplay] = useState(false);
+
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   const resetState = useCallback(() => {
-    setPersonaStates(initPersonaStates());
-    setCurrentRound(0);
+    setCompletedAgents([]);
+    setActiveAgent(null);
+    setDiscussionMsgs([]);
     setSynthesis(null);
+    setPhase("idle");
     setError(null);
+    setIsReplay(false);
+    eventSourceRef.current?.close();
   }, []);
 
   const loadSession = useCallback(async (sessionId: string) => {
     resetState();
+    setIsReplay(true);
     try {
       const res = await fetch(`/api/sessions/${sessionId}`);
       const data = await res.json();
       setActiveSession(data);
+
       if (data.messages) {
-        const states = initPersonaStates();
+        const agents: AgentState[] = [];
+        const disc: DiscussionMsg[] = [];
+        let syn: string | null = null;
+
         for (const msg of data.messages) {
           if (msg.persona === "orchestrator") {
-            setSynthesis(msg.content);
-          } else if (states[msg.persona]) {
-            states[msg.persona].status = "done";
-            states[msg.persona].messages.push({ round: msg.round, content: msg.content });
+            syn = msg.content;
+          } else if (msg.round === 1) {
+            agents.push({
+              personaId: msg.persona,
+              phase: "done",
+              assessment: msg.content,
+              question: null,
+              followup: null,
+              userAnswer: null,
+            });
+          } else if (msg.round === 2) {
+            disc.push({ personaId: msg.persona, content: msg.content });
           }
         }
-        setPersonaStates(states);
-        setCurrentRound(3);
+
+        setCompletedAgents(agents);
+        setDiscussionMsgs(disc);
+        setSynthesis(syn);
+        setPhase("complete");
       }
     } catch {
       setError("Failed to load session");
     }
   }, [resetState]);
 
+  const handleAnswer = useCallback(async (answer: string) => {
+    if (!activeSession) return;
+
+    try {
+      await fetch(`/api/sessions/${activeSession.id}/answer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer }),
+      });
+    } catch {
+      setError("Failed to send answer");
+    }
+  }, [activeSession]);
+
   const startEvaluation = useCallback(async (idea: string) => {
     resetState();
-    setIsEvaluating(true);
+    setPhase("agents");
     setError(null);
 
     try {
@@ -82,92 +117,174 @@ export default function App() {
       setActiveSession(session);
       setSessions((prev) => [session, ...prev]);
 
-      const eventSource = new EventSource(`/api/sessions/${session.id}/events`);
+      const es = new EventSource(`/api/sessions/${session.id}/events`);
+      eventSourceRef.current = es;
 
-      eventSource.onmessage = (event) => {
+      es.onmessage = (event) => {
         const data: SSEEvent = JSON.parse(event.data);
 
         switch (data.type) {
-          case "round_start":
-            setCurrentRound(data.round ?? 0);
-            break;
-          case "persona_thinking":
+          case "agent_enter":
             if (data.persona) {
-              setPersonaStates((prev) => ({
-                ...prev,
-                [data.persona!]: { ...prev[data.persona!], status: "thinking" },
-              }));
+              setActiveAgent({
+                personaId: data.persona,
+                phase: "entering",
+                assessment: null,
+                question: null,
+                followup: null,
+                userAnswer: null,
+              });
             }
             break;
-          case "persona_response":
+
+          case "agent_thinking":
+            setActiveAgent((prev) =>
+              prev ? { ...prev, phase: "thinking" } : prev
+            );
+            break;
+
+          case "agent_response":
+            if (data.content) {
+              setActiveAgent((prev) =>
+                prev
+                  ? { ...prev, phase: "responded", assessment: data.content! }
+                  : prev
+              );
+            }
+            break;
+
+          case "agent_question":
+            if (data.content) {
+              setActiveAgent((prev) =>
+                prev
+                  ? { ...prev, phase: "questioning", question: data.content! }
+                  : prev
+              );
+            }
+            break;
+
+          case "user_answer":
+            if (data.content) {
+              setActiveAgent((prev) =>
+                prev
+                  ? { ...prev, phase: "waiting", userAnswer: data.content! }
+                  : prev
+              );
+            }
+            break;
+
+          case "agent_followup":
+            if (data.content) {
+              setActiveAgent((prev) =>
+                prev
+                  ? { ...prev, phase: "followup", followup: data.content! }
+                  : prev
+              );
+            }
+            break;
+
+          case "agent_done":
+            setActiveAgent((current) => {
+              if (current) {
+                setCompletedAgents((prev) => [
+                  ...prev,
+                  { ...current, phase: "done" },
+                ]);
+              }
+              return null;
+            });
+            break;
+
+          case "round_start":
+            if (data.round === 2) setPhase("discussion");
+            if (data.round === 3) setPhase("synthesis");
+            break;
+
+          case "discussion_message":
             if (data.persona && data.content) {
-              setPersonaStates((prev) => ({
+              setDiscussionMsgs((prev) => [
                 ...prev,
-                [data.persona!]: {
-                  status: "done",
-                  messages: [...(prev[data.persona!]?.messages ?? []), { round: data.round ?? 1, content: data.content! }],
-                },
-              }));
+                { personaId: data.persona!, content: data.content! },
+              ]);
             }
             break;
+
           case "synthesis":
             if (data.content) setSynthesis(data.content);
             break;
+
           case "evaluation_complete":
-            setIsEvaluating(false);
-            setActiveSession((prev) => prev ? { ...prev, status: "complete" } : null);
-            eventSource.close();
+            setPhase("complete");
+            setActiveSession((prev) =>
+              prev ? { ...prev, status: "complete" } : null
+            );
+            es.close();
             break;
+
           case "error":
             setError(data.content ?? "An error occurred");
-            setIsEvaluating(false);
-            eventSource.close();
+            setPhase("idle");
+            es.close();
             break;
         }
       };
 
-      eventSource.onerror = () => {
-        setError("Connection lost. Please refresh and try again.");
-        setIsEvaluating(false);
-        eventSource.close();
+      es.onerror = () => {
+        setError("Connection lost. Please refresh.");
+        setPhase("idle");
+        es.close();
       };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
-      setIsEvaluating(false);
+      setPhase("idle");
     }
   }, [resetState]);
 
   const handleNewSession = useCallback(() => {
     resetState();
     setActiveSession(null);
-    setIsEvaluating(false);
   }, [resetState]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header onNewSession={handleNewSession} showNew={activeSession !== null} />
+      <Header
+        onNewSession={handleNewSession}
+        showNew={activeSession !== null}
+        onToggleSidebar={() => setSidebarOpen((o) => !o)}
+        hasSessions={sessions.length > 0}
+      />
 
       <div className="flex flex-1 overflow-hidden">
-        {sessions.length > 0 && (
-          <SessionSidebar
-            sessions={sessions}
-            activeId={activeSession?.id ?? null}
-            onSelect={loadSession}
-          />
-        )}
+        <CollapsibleSidebar
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          sessions={sessions}
+          activeId={activeSession?.id ?? null}
+          onSelect={(id) => {
+            loadSession(id);
+            setSidebarOpen(false);
+          }}
+        />
 
         <main className="flex-1 overflow-y-auto">
           {!activeSession ? (
-            <LandingInput onSubmit={startEvaluation} disabled={isEvaluating} />
+            <LandingInput
+              onSubmit={startEvaluation}
+              disabled={phase !== "idle"}
+            />
           ) : (
             <EvaluationView
               session={activeSession}
               personas={PERSONAS}
-              personaStates={personaStates}
-              currentRound={currentRound}
+              personaMap={personaMap}
+              completedAgents={completedAgents}
+              activeAgent={activeAgent}
+              discussionMsgs={discussionMsgs}
               synthesis={synthesis}
-              isEvaluating={isEvaluating}
+              phase={phase}
               error={error}
+              isReplay={isReplay}
+              onAnswer={handleAnswer}
             />
           )}
         </main>

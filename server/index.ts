@@ -10,7 +10,7 @@ import {
   listSessions,
   getMessages,
 } from "./db.js";
-import { runEvaluation, personas } from "./agents.js";
+import { runEvaluation, personas, submitAnswer } from "./agents.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -28,8 +28,7 @@ if (process.env.NODE_ENV === "production") {
 
 // Health check
 app.get("/api/health", (_req, res) => {
-  const hasKey = !!process.env.OPENROUTER_API_KEY;
-  res.json({ ok: true, hasApiKey: hasKey });
+  res.json({ ok: true, hasApiKey: !!process.env.OPENROUTER_API_KEY });
 });
 
 // Get personas list
@@ -47,11 +46,10 @@ app.get("/api/personas", (_req, res) => {
 
 // List sessions
 app.get("/api/sessions", (_req, res) => {
-  const sessions = listSessions.all();
-  res.json(sessions);
+  res.json(listSessions.all());
 });
 
-// Get session detail — must be registered BEFORE the SSE route
+// Get session detail
 app.get("/api/sessions/:id", (req, res) => {
   const session = getSession.get(req.params.id) as Record<string, unknown> | undefined;
   if (!session) {
@@ -78,8 +76,24 @@ app.post("/api/sessions", (req, res) => {
 
   const id = nanoid(12);
   createSession.run(id, idea.trim(), "evaluating");
-
   res.json({ id, idea: idea.trim(), status: "evaluating" });
+});
+
+// Submit answer to an agent's question
+app.post("/api/sessions/:id/answer", (req, res) => {
+  const { answer } = req.body;
+  if (!answer || typeof answer !== "string") {
+    res.status(400).json({ error: "Answer text is required" });
+    return;
+  }
+
+  const ok = submitAnswer(req.params.id, answer.trim());
+  if (!ok) {
+    res.status(404).json({ error: "No pending question for this session" });
+    return;
+  }
+
+  res.json({ ok: true });
 });
 
 // SSE stream for session evaluation
@@ -107,11 +121,14 @@ app.get("/api/sessions/:id/events", (req, res) => {
   res.setHeader("X-Accel-Buffering", "no");
   res.flushHeaders();
 
+  let closed = false;
+  req.on("close", () => { closed = true; });
+
   const sendEvent = (data: Record<string, unknown>) => {
-    res.write(`data: ${JSON.stringify(data)}\n\n`);
+    if (!closed) res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
-  // If already complete, replay stored messages
+  // Replay completed sessions
   if (session.status === "complete" || session.status === "error") {
     const messages = getMessages.all(session.id) as Array<{
       persona: string;
@@ -119,35 +136,27 @@ app.get("/api/sessions/:id/events", (req, res) => {
       content: string;
     }>;
     for (const msg of messages) {
-      sendEvent({
-        type: "persona_response",
-        persona: msg.persona,
-        round: msg.round,
-        content: msg.content,
-      });
+      if (msg.persona === "orchestrator") {
+        sendEvent({ type: "synthesis", round: 3, content: msg.content });
+      } else {
+        sendEvent({
+          type: msg.round === 1 ? "agent_response" : "discussion_message",
+          persona: msg.persona,
+          round: msg.round,
+          content: msg.content,
+        });
+      }
     }
     sendEvent({ type: "evaluation_complete", status: session.status });
     res.end();
     return;
   }
 
-  let closed = false;
-  req.on("close", () => {
-    closed = true;
-  });
-
-  const safeSend = (data: Record<string, unknown>) => {
-    if (!closed) sendEvent(data);
-  };
-
-  // Run evaluation and stream events
-  runEvaluation(session.id, session.idea, apiKey, safeSend)
-    .then(() => {
-      if (!closed) res.end();
-    })
+  runEvaluation(session.id, session.idea, apiKey, sendEvent)
+    .then(() => { if (!closed) res.end(); })
     .catch((err) => {
       if (!closed) {
-        safeSend({ type: "error", content: String(err) });
+        sendEvent({ type: "error", content: String(err) });
         res.end();
       }
     });
