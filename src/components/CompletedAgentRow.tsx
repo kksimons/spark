@@ -78,7 +78,7 @@ export function CompletedAgentRow({
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="bg-white border border-t-0 border-border/60 rounded-b-xl -mt-3 px-8 sm:px-12 py-6">
+            <div className="bg-white border border-t-0 border-border/60 rounded-b-xl -mt-3 px-12 sm:px-16 py-10">
               <div className="max-h-[32rem] overflow-y-auto text-[14px] leading-[1.75] text-foreground/85 prose prose-sm prose-neutral max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground [&_strong]:font-semibold [&_p]:mb-3 [&_ul]:space-y-2 [&_ul]:my-3 [&_ol]:space-y-2 [&_ol]:my-3 [&_li]:text-foreground/80 [&_h1]:text-[18px] [&_h1]:font-bold [&_h2]:text-[16px] [&_h2]:font-bold [&_h3]:text-[14px] [&_h3]:font-semibold">
                 <ReactMarkdown>{state.assessment ?? ""}</ReactMarkdown>
               </div>
