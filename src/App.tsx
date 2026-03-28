@@ -27,7 +27,6 @@ export default function App() {
   const [discussionMsgs, setDiscussionMsgs] = useState<DiscussionMsg[]>([]);
   const [synthesis, setSynthesis] = useState<string | null>(null);
   const [phase, setPhase] = useState<"idle" | "agents" | "discussion" | "synthesis" | "complete">("idle");
-  const [error, setError] = useState<string | null>(null);
   const [isReplay, setIsReplay] = useState(false);
 
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -38,7 +37,6 @@ export default function App() {
     setDiscussionMsgs([]);
     setSynthesis(null);
     setPhase("idle");
-    setError(null);
     setIsReplay(false);
     eventSourceRef.current?.close();
   }, []);
@@ -79,7 +77,7 @@ export default function App() {
         setPhase("complete");
       }
     } catch {
-      setError("Failed to load session");
+      toast.error("Failed to load session");
     }
   }, [resetState]);
 
@@ -93,14 +91,13 @@ export default function App() {
         body: JSON.stringify({ answer }),
       });
     } catch {
-      setError("Failed to send answer");
+      toast.error("Failed to send answer");
     }
   }, [activeSession]);
 
   const startEvaluation = useCallback(async (idea: string) => {
     resetState();
     setPhase("agents");
-    setError(null);
 
     try {
       const res = await fetch("/api/sessions", {
@@ -241,17 +238,10 @@ export default function App() {
     }
   }, [resetState]);
 
-  const handleNewSession = useCallback(() => {
-    resetState();
-    setActiveSession(null);
-  }, [resetState]);
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Toaster position="top-center" />
       <Header
-        onNewSession={handleNewSession}
-        showNew={activeSession !== null}
         onToggleSidebar={() => setSidebarOpen((o) => !o)}
         hasSessions={sessions.length > 0}
       />
@@ -284,7 +274,6 @@ export default function App() {
               discussionMsgs={discussionMsgs}
               synthesis={synthesis}
               phase={phase}
-              error={error}
               isReplay={isReplay}
               onAnswer={handleAnswer}
             />

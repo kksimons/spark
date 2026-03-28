@@ -16,7 +16,6 @@ interface EvaluationViewProps {
   discussionMsgs: DiscussionMsg[];
   synthesis: string | null;
   phase: "idle" | "agents" | "discussion" | "synthesis" | "complete";
-  error: string | null;
   isReplay: boolean;
   onAnswer: (answer: string) => void;
 }
@@ -30,7 +29,6 @@ export function EvaluationView({
   discussionMsgs,
   synthesis,
   phase,
-  error,
   isReplay,
   onAnswer,
 }: EvaluationViewProps) {
@@ -43,9 +41,6 @@ export function EvaluationView({
       }, 200);
     }
   }, [discussionMsgs.length, synthesis]);
-
-  const showingTimeline =
-    completedAgents.length > 0 || discussionMsgs.length > 0 || synthesis;
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">

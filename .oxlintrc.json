@@ -1,0 +1,3 @@
+{
+  "ignorePatterns": ["vite.config.ts", "postcss.config.js", "dist/**", "data/**"]
+}
