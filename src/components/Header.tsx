@@ -7,7 +7,7 @@ interface HeaderProps {
 
 export function Header({ onToggleSidebar, hasSessions }: HeaderProps) {
   return (
-    <header className="h-16 border-b border-border/60 flex items-center justify-between px-8 sm:px-14 bg-white shrink-0 z-30">
+    <header className="h-14 sm:h-16 border-b border-border/60 flex items-center justify-between px-4 sm:px-14 bg-white shrink-0 z-30">
       <div className="flex items-center gap-3">
         {hasSessions && (
           <button

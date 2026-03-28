@@ -61,7 +61,7 @@ export function QuestionBubble({
             : {}
         }
         transition={!submitted ? { duration: 2, repeat: Infinity } : {}}
-        className="bg-white border border-border/60 rounded-xl px-8 sm:px-10 py-7 relative shadow-[0_2px_24px_rgba(61,155,143,0.08)]"
+        className="bg-white border border-border/60 rounded-xl px-5 sm:px-10 py-5 sm:py-7 relative shadow-[0_2px_24px_rgba(61,155,143,0.08)]"
       >
         {/* Tail pointing up to the card */}
         <div className="absolute -top-[7px] left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-white border-t border-l border-border/60 rotate-45" />
@@ -83,25 +83,25 @@ export function QuestionBubble({
 
         {/* Answer input */}
         {!submitted ? (
-          <div className="flex gap-4 mt-8 px-4 sm:px-8 mb-2">
+          <div className="flex gap-3 sm:gap-4 mt-6 sm:mt-8 px-0 sm:px-8 mb-6 sm:mb-4">
             <input
               ref={inputRef}
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="Type your answer..."
-              className="flex-1 bg-muted rounded-xl pl-8 pr-5 py-4 text-[14px] text-foreground placeholder:text-muted-foreground/35 border border-transparent focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/10 transition-all"
+              className="flex-1 bg-muted rounded-xl pl-4 sm:pl-8 pr-4 py-3 sm:py-4 text-[14px] text-foreground placeholder:text-muted-foreground/35 border border-transparent focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/10 transition-all"
             />
             <button
               onClick={handleSubmit}
               disabled={!value.trim()}
-              className="w-14 h-14 bg-accent text-white rounded-xl flex items-center justify-center disabled:opacity-30 hover:bg-accent/90 transition-colors shrink-0 self-center"
+              className="w-11 h-11 sm:w-14 sm:h-14 bg-accent text-white rounded-xl flex items-center justify-center disabled:opacity-30 hover:bg-accent/90 transition-colors shrink-0 self-center"
             >
               <Send className="w-5 h-5 ml-0.5" />
             </button>
           </div>
         ) : (
-          <div className="bg-muted/50 rounded-xl px-8 py-5 mx-4 sm:mx-8 mb-2">
+          <div className="bg-muted/50 rounded-xl px-5 sm:px-8 py-4 mx-0 sm:mx-8 mb-2">
             <p className="text-[10px] font-semibold text-muted-foreground tracking-wide mb-1">
               Your answer
             </p>

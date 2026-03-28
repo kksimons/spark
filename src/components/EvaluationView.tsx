@@ -35,24 +35,22 @@ export function EvaluationView({
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (discussionMsgs.length > 0 || synthesis) {
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-      }, 200);
-    }
-  }, [discussionMsgs.length, synthesis]);
+    setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 1200);
+  }, [discussionMsgs.length, synthesis, activeAgent?.phase]);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+    <div className="flex flex-col min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)]">
       {/* Idea banner — top, with padding */}
-      <div className="px-6 sm:px-10 pt-6 pb-8">
+      <div className="px-4 sm:px-10 pt-6 sm:pt-6 pb-6 sm:pb-8">
         <div className="flex">
           <IdeaCard idea={session.idea} />
         </div>
       </div>
 
       {/* Center stage — agent cards centered like landing page */}
-      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 mt-8">
+      <div className="flex-1 flex flex-col items-center px-4 sm:px-8 mt-4 sm:mt-8">
         {/* Completed agents */}
         {completedAgents.length > 0 && (
           <div className="w-full max-w-3xl space-y-3 mb-8">
@@ -133,7 +131,7 @@ export function EvaluationView({
 
         {/* Error is now handled by toast in App.tsx */}
 
-        <div ref={bottomRef} className="pb-20" />
+        <div ref={bottomRef} className="h-48 sm:h-20" />
       </div>
     </div>
   );

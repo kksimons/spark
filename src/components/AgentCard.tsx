@@ -190,7 +190,7 @@ function AssessmentCard({
   return (
     <div className="bg-white rounded-xl border border-border/60 shadow-[0_2px_24px_rgba(61,155,143,0.08)]">
       {/* Header */}
-      <div className="flex items-center gap-4 px-10 sm:px-14 py-6 border-b border-border/30">
+      <div className="flex items-center gap-4 px-5 sm:px-14 py-5 sm:py-6 border-b border-border/30">
         <div className="w-12 h-12 rounded-lg overflow-hidden border border-border/60 shrink-0">
           <img
             src={persona.avatar}
@@ -209,13 +209,13 @@ function AssessmentCard({
       </div>
 
       {/* Assessment content */}
-      <div className="px-12 sm:px-20 py-12 max-h-[40rem] overflow-y-auto text-[15px] leading-[1.75] text-foreground/85 prose prose-sm prose-neutral max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground [&_strong]:font-semibold [&_ul]:space-y-2 [&_ol]:space-y-2 [&_li]:text-foreground/80 [&_h1]:text-[20px] [&_h1]:font-bold [&_h2]:text-[17px] [&_h2]:font-bold [&_h3]:text-[15px] [&_h3]:font-semibold [&_p]:mb-4 [&_ul]:my-3 [&_ol]:my-3">
+      <div className="px-5 sm:px-20 py-6 sm:py-12 max-h-[40rem] overflow-y-auto text-[14px] sm:text-[15px] leading-[1.75] text-foreground/85 prose prose-sm prose-neutral max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground [&_strong]:font-semibold [&_ul]:space-y-2 [&_ol]:space-y-2 [&_li]:text-foreground/80 [&_h1]:text-[18px] sm:text-[20px] [&_h1]:font-bold [&_h2]:text-[16px] sm:text-[17px] [&_h2]:font-bold [&_h3]:text-[14px] sm:text-[15px] [&_h3]:font-semibold [&_p]:mb-4 [&_ul]:my-3 [&_ol]:my-3">
         <ReactMarkdown>{state.assessment ?? ""}</ReactMarkdown>
       </div>
 
       {/* Followup (if user answered a question) */}
       {state.followup && (
-        <div className="mx-12 sm:mx-14 mb-8 px-6 py-5 bg-accent/5 border border-accent/10 rounded-lg">
+        <div className="mx-5 sm:mx-14 mb-6 sm:mb-8 px-5 sm:px-6 py-4 sm:py-5 bg-accent/5 border border-accent/10 rounded-lg">
           <p className="text-[10px] font-bold text-accent uppercase tracking-[0.15em] mb-2">
             Updated take
           </p>

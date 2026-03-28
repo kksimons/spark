@@ -63,7 +63,7 @@ export function DiscussionSection({
               className="bg-white border border-border/60 rounded-xl shadow-sm"
             >
               {/* Agent header */}
-              <div className="flex items-center gap-3 px-8 sm:px-10 pt-6 pb-4 border-b border-border/30">
+              <div className="flex items-center gap-3 px-5 sm:px-10 pt-5 sm:pt-6 pb-3 sm:pb-4 border-b border-border/30">
                 <div className="w-9 h-9 rounded-lg overflow-hidden border border-border/60 shrink-0">
                   <img src={persona.avatar} alt={persona.name} className="w-full h-full object-cover" />
                 </div>
@@ -77,7 +77,7 @@ export function DiscussionSection({
                 </div>
               </div>
               {/* Message body */}
-              <div className="px-12 sm:px-16 py-10 text-[15px] leading-[1.75] text-foreground/85 prose prose-sm prose-neutral max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground [&_strong]:font-semibold [&_p]:mb-3 [&_ul]:space-y-2 [&_ul]:my-3 [&_ol]:space-y-2 [&_ol]:my-3 [&_li]:text-foreground/80 [&_h1]:text-[18px] [&_h1]:font-bold [&_h2]:text-[16px] [&_h2]:font-bold [&_h3]:text-[14px] [&_h3]:font-semibold">
+              <div className="px-5 sm:px-16 py-6 sm:py-10 text-[14px] sm:text-[15px] leading-[1.75] text-foreground/85 prose prose-sm prose-neutral max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground [&_strong]:font-semibold [&_p]:mb-3 [&_ul]:space-y-2 [&_ul]:my-3 [&_ol]:space-y-2 [&_ol]:my-3 [&_li]:text-foreground/80 [&_h1]:text-[16px] sm:text-[18px] [&_h1]:font-bold [&_h2]:text-[15px] sm:text-[16px] [&_h2]:font-bold [&_h3]:text-[13px] sm:text-[14px] [&_h3]:font-semibold">
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
             </motion.div>
