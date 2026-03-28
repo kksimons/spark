@@ -42,7 +42,22 @@
 
   body {
     font-family: var(--font-sans);
-    background: var(--color-background);
+    background:
+      var(--color-background)
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 23px,
+        rgba(0, 0, 0, 0.03) 23px,
+        rgba(0, 0, 0, 0.03) 24px
+      )
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 23px,
+        rgba(0, 0, 0, 0.03) 23px,
+        rgba(0, 0, 0, 0.03) 24px
+      );
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
