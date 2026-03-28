@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export function Header({ onNewSession, showNew, onToggleSidebar, hasSessions }: HeaderProps) {
   return (
-    <header className="h-16 border-b border-border/60 flex items-center justify-between px-8 sm:px-12 bg-white shrink-0 z-30">
+    <header className="h-16 border-b border-border/60 flex items-center justify-between px-8 sm:px-14 bg-white shrink-0 z-30">
       <div className="flex items-center gap-3">
         {hasSessions && (
           <button
@@ -29,15 +29,15 @@ export function Header({ onNewSession, showNew, onToggleSidebar, hasSessions }: 
         </div>
       </div>
 
-      {showNew && (
-        <button
-          onClick={onNewSession}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold tracking-wide border border-border rounded-md hover:bg-muted transition-colors"
-        >
-          <Plus className="w-3 h-3" />
-          New Spark
-        </button>
-      )}
+      {/* {showNew && ( */}
+      {/*   <button */}
+      {/*     onClick={onNewSession} */}
+      {/*     className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold tracking-wide border border-border rounded-md hover:bg-muted transition-colors" */}
+      {/*   > */}
+      {/*     <Plus className="w-3 h-3" /> */}
+      {/*     New Spark */}
+      {/*   </button> */}
+      {/* )} */}
     </header>
   );
 }

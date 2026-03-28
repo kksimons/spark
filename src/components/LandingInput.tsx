@@ -55,11 +55,11 @@ export function LandingInput({ onSubmit, disabled }: LandingInputProps) {
         className="flex justify-center gap-5 sm:gap-6"
       >
         {[
-          { name: "Dayee", dept: "Security", avatar: "/dayee.png" },
-          { name: "Nathan", dept: "Digital", avatar: "/nathan.png" },
-          { name: "Dana", dept: "Architecture", avatar: "/dana.png" },
-          { name: "Lalindra", dept: "Design", avatar: "/lalindra.png" },
-          { name: "Kyle", dept: "Engineering", avatar: "/kyle.png" },
+          { name: "Dayee", dept: "Security", avatar: "/dayee.png", greeting: "Hey! I'll keep it secure." },
+          { name: "Nathan", dept: "Digital", avatar: "/nathan.png", greeting: "Hi! I'll sort the infra." },
+          { name: "Dana", dept: "Architecture", avatar: "/dana.png", greeting: "Hello! Let's see what fits." },
+          { name: "Lalindra", dept: "Design", avatar: "/lalindra.png", greeting: "Hey! I'll make it shine." },
+          { name: "Kyle", dept: "Engineering", avatar: "/kyle.png", greeting: "Yo! Let's build this." },
         ].map((p, i) => (
           <motion.div
             key={p.name}
@@ -67,8 +67,16 @@ export function LandingInput({ onSubmit, disabled }: LandingInputProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 + i * 0.09 }}
             whileHover={{ y: -6, transition: { type: "spring", stiffness: 400, damping: 15 } }}
-            className="group text-center cursor-default"
+            className="group text-center cursor-default relative"
           >
+            {/* Speech bubble on hover */}
+            <div className="absolute -top-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none z-10">
+              <div className="bg-white border border-accent/20 rounded-lg px-3 py-1.5 shadow-[0_4px_16px_rgba(61,155,143,0.12)] whitespace-nowrap">
+                <p className="text-[11px] font-medium text-foreground tracking-[-0.01em]">{p.greeting}</p>
+              </div>
+              <div className="w-2.5 h-2.5 bg-white border-b border-r border-accent/20 rotate-45 mx-auto -mt-[5px]" />
+            </div>
+
             <motion.div
               whileHover={{ scale: 1.08 }}
               transition={{ type: "spring", stiffness: 400, damping: 15 }}
@@ -104,10 +112,10 @@ export function LandingInput({ onSubmit, disabled }: LandingInputProps) {
             placeholder={"Describe your idea here..."}
             disabled={disabled}
             rows={4}
-            style={{ padding: "1.75rem 2.5rem 5rem 2.5rem" }}
+            style={{ padding: "2rem 3rem 5.5rem 3rem" }}
             className="w-full resize-none bg-transparent text-foreground placeholder:text-muted-foreground/28 focus:outline-none text-[15px] leading-[1.7] disabled:opacity-50"
           />
-          <div className="absolute bottom-5 right-5">
+          <div className="absolute bottom-6 right-6">
             <button
               onClick={handleSubmit}
               disabled={!value.trim() || disabled}

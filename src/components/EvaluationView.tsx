@@ -36,7 +36,6 @@ export function EvaluationView({
 }: EvaluationViewProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll on new discussion messages or synthesis
   useEffect(() => {
     if (discussionMsgs.length > 0 || synthesis) {
       setTimeout(() => {
@@ -45,128 +44,129 @@ export function EvaluationView({
     }
   }, [discussionMsgs.length, synthesis]);
 
-  return (
-    <div className="max-w-2xl mx-auto px-6 sm:px-10 py-8 pb-24 space-y-5">
-      {/* Idea */}
-      <IdeaCard idea={session.idea} />
+  const showingTimeline =
+    completedAgents.length > 0 || discussionMsgs.length > 0 || synthesis;
 
-      {/* Completed agents (collapsed rows) */}
-      {completedAgents.length > 0 && (
-        <div className="space-y-2">
-          {completedAgents.map((agent, i) => {
-            const persona = personaMap[agent.personaId];
-            if (!persona) return null;
-            return (
-              <CompletedAgentRow
-                key={agent.personaId}
-                persona={persona}
-                state={agent}
-                index={i}
+  return (
+    <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+      {/* Idea banner — top, with padding */}
+      <div className="px-8 sm:px-14 pt-8 pb-4">
+        <div className="max-w-2xl">
+          <IdeaCard idea={session.idea} />
+        </div>
+      </div>
+
+      {/* Center stage — agent cards centered like landing page */}
+      <div className="flex-1 flex flex-col items-center px-6 sm:px-8 mt-8">
+        {/* Completed agents */}
+        {completedAgents.length > 0 && (
+          <div className="w-full max-w-lg space-y-2 mb-6">
+            {completedAgents.map((agent, i) => {
+              const persona = personaMap[agent.personaId];
+              if (!persona) return null;
+              return (
+                <CompletedAgentRow
+                  key={agent.personaId}
+                  persona={persona}
+                  state={agent}
+                  index={i}
+                  isReplay={isReplay}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {/* Active agent — centered */}
+        <AnimatePresence mode="wait">
+          {activeAgent && personaMap[activeAgent.personaId] && (
+            <motion.div
+              key={activeAgent.personaId}
+              className="w-full max-w-lg"
+            >
+              <AgentCard
+                persona={personaMap[activeAgent.personaId]}
+                state={activeAgent}
+                onAnswer={onAnswer}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Waiting indicator */}
+        {phase === "agents" && !activeAgent && completedAgents.length > 0 && completedAgents.length < personas.length && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="py-8"
+          >
+            <LoadingPill text="Next specialist is stepping in..." />
+          </motion.div>
+        )}
+
+        {/* Discussion */}
+        {(phase === "discussion" || phase === "synthesis" || phase === "complete") &&
+          discussionMsgs.length > 0 && (
+            <div className="w-full max-w-lg mt-6">
+              <DiscussionSection
+                messages={discussionMsgs}
+                personaMap={personaMap}
                 isReplay={isReplay}
               />
-            );
-          })}
-        </div>
-      )}
-
-      {/* Active agent (the dramatic card) */}
-      <AnimatePresence mode="wait">
-        {activeAgent && personaMap[activeAgent.personaId] && (
-          <div key={activeAgent.personaId} className="flex justify-center py-4">
-            <AgentCard
-              persona={personaMap[activeAgent.personaId]}
-              state={activeAgent}
-              onAnswer={onAnswer}
-            />
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Waiting indicator between agents */}
-      {phase === "agents" && !activeAgent && completedAgents.length > 0 && completedAgents.length < personas.length && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="flex justify-center py-6"
-        >
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/5 border border-accent/10">
-            <div className="flex gap-1">
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  className="w-1.5 h-1.5 bg-accent rounded-full"
-                  animate={{ opacity: [0.3, 1, 0.3] }}
-                  transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                />
-              ))}
             </div>
-            <span className="text-xs text-accent font-medium">
-              Next specialist is stepping in...
-            </span>
-          </div>
-        </motion.div>
-      )}
+          )}
 
-      {/* Cross-department discussion */}
-      {(phase === "discussion" || phase === "synthesis" || phase === "complete") &&
-        discussionMsgs.length > 0 && (
-          <DiscussionSection
-            messages={discussionMsgs}
-            personaMap={personaMap}
-            isReplay={isReplay}
-          />
+        {phase === "discussion" && discussionMsgs.length === 0 && (
+          <div className="py-8">
+            <LoadingPill text="Team is talking it out..." />
+          </div>
         )}
 
-      {/* Discussion loading */}
-      {phase === "discussion" && discussionMsgs.length === 0 && (
-        <LoadingPill text="Team is talking it out..." />
-      )}
+        {phase === "synthesis" && !synthesis && (
+          <div className="py-8">
+            <LoadingPill text="Pulling it all together..." />
+          </div>
+        )}
 
-      {/* Synthesis loading */}
-      {phase === "synthesis" && !synthesis && (
-        <LoadingPill text="Pulling it all together..." />
-      )}
+        {/* Synthesis */}
+        {synthesis && (
+          <div className="w-full max-w-lg mt-6 mb-10">
+            <SynthesisCard content={synthesis} />
+          </div>
+        )}
 
-      {/* Synthesis */}
-      {synthesis && <SynthesisCard content={synthesis} />}
+        {/* Error */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="w-full max-w-lg bg-red-50 border border-red-200 rounded-xl p-5 text-red-600 text-sm text-center mt-6"
+          >
+            {error}
+          </motion.div>
+        )}
 
-      {/* Error */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm text-center"
-        >
-          {error}
-        </motion.div>
-      )}
-
-      <div ref={bottomRef} />
+        <div ref={bottomRef} className="pb-20" />
+      </div>
     </div>
   );
 }
 
 function LoadingPill({ text }: { text: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex justify-center py-4"
-    >
-      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/5 border border-accent/10">
-        <div className="flex gap-1">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-1.5 h-1.5 bg-accent rounded-full"
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-            />
-          ))}
-        </div>
-        <span className="text-xs text-accent font-medium">{text}</span>
+    <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/5 border border-accent/10">
+      <div className="flex gap-1">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            className="w-1.5 h-1.5 bg-accent rounded-full"
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+          />
+        ))}
       </div>
-    </motion.div>
+      <span className="text-xs text-accent font-medium">{text}</span>
+    </div>
   );
 }

@@ -47,24 +47,26 @@ export function AgentCard({ persona, state, onAnswer }: AgentCardProps) {
         damping: 16,
         mass: 1.4,
       }}
-      className="flex flex-col items-center gap-4"
+      className="flex flex-col items-center gap-6 w-full max-w-xl"
     >
       {/* The card itself */}
-      <div className="perspective w-full max-w-xs">
+      <div className="perspective w-full">
         <AnimatePresence mode="wait" initial={false}>
           {!flipped ? (
-            /* ── Badge front ── */
+            /* ── Badge front — narrow, centered ── */
             <motion.div
               key="front"
               initial={{ rotateY: 0 }}
               exit={{ rotateY: 90, opacity: 0 }}
               transition={{ duration: 0.35, ease: "easeIn" }}
-              className="w-full"
+              className="flex justify-center"
             >
-              <BadgeFront persona={persona} isThinking={state.phase === "thinking"} />
+              <div className="w-56">
+                <BadgeFront persona={persona} isThinking={state.phase === "thinking"} />
+              </div>
             </motion.div>
           ) : (
-            /* ── Assessment back ── */
+            /* ── Assessment back — full width ── */
             <motion.div
               key="back"
               initial={{ rotateY: -90, opacity: 0 }}
@@ -186,10 +188,10 @@ function AssessmentCard({
   state: AgentState;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-accent/20 shadow-[0_4px_32px_rgba(61,155,143,0.12)] overflow-hidden">
+    <div className="bg-white rounded-xl border border-border/60 shadow-[0_2px_24px_rgba(61,155,143,0.08)]">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border/40">
-        <div className="w-10 h-10 rounded-lg overflow-hidden border border-border/60 shrink-0">
+      <div className="flex items-center gap-4 px-12 sm:px-14 py-6 border-b border-border/30">
+        <div className="w-12 h-12 rounded-lg overflow-hidden border border-border/60 shrink-0">
           <img
             src={persona.avatar}
             alt={persona.name}
@@ -197,27 +199,27 @@ function AssessmentCard({
           />
         </div>
         <div>
-          <p className="text-[13px] font-semibold text-foreground leading-none tracking-[-0.01em]">
+          <p className="text-[15px] font-semibold text-foreground leading-none tracking-[-0.01em]">
             {persona.name}
           </p>
-          <p className="text-[11px] text-accent font-medium mt-1 tracking-wide">
+          <p className="text-[11px] text-accent font-medium mt-1.5 tracking-wide">
             {persona.department}
           </p>
         </div>
       </div>
 
       {/* Assessment content */}
-      <div className="px-4 py-3 max-h-80 overflow-y-auto text-[13px] leading-[1.7] text-foreground/80 prose prose-sm prose-neutral [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground [&_strong]:font-semibold [&_ul]:space-y-0.5 [&_ol]:space-y-0.5 [&_li]:text-foreground/75 [&_h1]:text-sm [&_h2]:text-[13px] [&_h3]:text-xs [&_p]:mb-2">
+      <div className="px-12 sm:px-14 py-8 max-h-[28rem] overflow-y-auto text-[14px] leading-[1.8] text-foreground/70 prose prose-sm prose-neutral [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground/90 [&_strong]:font-semibold [&_ul]:space-y-1.5 [&_ol]:space-y-1.5 [&_li]:text-foreground/65 [&_h1]:text-[15px] [&_h2]:text-[14px] [&_h3]:text-[13px] [&_p]:mb-3.5">
         <ReactMarkdown>{state.assessment ?? ""}</ReactMarkdown>
       </div>
 
       {/* Followup (if user answered a question) */}
       {state.followup && (
-        <div className="mx-4 mb-3 px-3 py-2 bg-accent/5 border border-accent/10 rounded-lg">
-          <p className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1">
+        <div className="mx-12 sm:mx-14 mb-8 px-6 py-5 bg-accent/5 border border-accent/10 rounded-lg">
+          <p className="text-[10px] font-bold text-accent uppercase tracking-[0.15em] mb-2">
             Updated take
           </p>
-          <p className="text-xs text-foreground/80 leading-relaxed">
+          <p className="text-[13px] text-foreground/70 leading-[1.75]">
             {state.followup}
           </p>
         </div>
