@@ -50,8 +50,8 @@ export function EvaluationView({
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       {/* Idea banner — top, with padding */}
-      <div className="px-8 sm:px-14 pt-8 pb-4">
-        <div className="max-w-2xl">
+      <div className="px-6 sm:px-10 pt-6 pb-8">
+        <div className="flex">
           <IdeaCard idea={session.idea} />
         </div>
       </div>
@@ -136,16 +136,7 @@ export function EvaluationView({
           </div>
         )}
 
-        {/* Error */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="w-full max-w-lg bg-red-50 border border-red-200 rounded-xl p-5 text-red-600 text-sm text-center mt-6"
-          >
-            {error}
-          </motion.div>
-        )}
+        {/* Error is now handled by toast in App.tsx */}
 
         <div ref={bottomRef} className="pb-20" />
       </div>

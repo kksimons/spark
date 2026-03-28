@@ -83,25 +83,25 @@ export function QuestionBubble({
 
         {/* Answer input */}
         {!submitted ? (
-          <div className="flex gap-3">
+          <div className="flex gap-4 mt-8 px-4 sm:px-8 mb-2">
             <input
               ref={inputRef}
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="Type your answer..."
-              className="flex-1 bg-muted rounded-lg px-5 py-3 text-[14px] text-foreground placeholder:text-muted-foreground/35 focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
+              className="flex-1 bg-muted rounded-xl pl-8 pr-5 py-4 text-[14px] text-foreground placeholder:text-muted-foreground/35 border border-transparent focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/10 transition-all"
             />
             <button
               onClick={handleSubmit}
               disabled={!value.trim()}
-              className="w-10 h-10 bg-accent text-white rounded-lg flex items-center justify-center disabled:opacity-30 hover:bg-accent/90 transition-colors shrink-0 self-center"
+              className="w-14 h-14 bg-accent text-white rounded-xl flex items-center justify-center disabled:opacity-30 hover:bg-accent/90 transition-colors shrink-0 self-center"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-5 ml-0.5" />
             </button>
           </div>
         ) : (
-          <div className="bg-muted/50 rounded-lg px-5 py-3">
+          <div className="bg-muted/50 rounded-xl px-8 py-5 mx-4 sm:mx-8 mb-2">
             <p className="text-[10px] font-semibold text-muted-foreground tracking-wide mb-1">
               Your answer
             </p>

@@ -190,7 +190,7 @@ function AssessmentCard({
   return (
     <div className="bg-white rounded-xl border border-border/60 shadow-[0_2px_24px_rgba(61,155,143,0.08)]">
       {/* Header */}
-      <div className="flex items-center gap-4 px-12 sm:px-14 py-6 border-b border-border/30">
+      <div className="flex items-center gap-4 px-10 sm:px-14 py-6 border-b border-border/30">
         <div className="w-12 h-12 rounded-lg overflow-hidden border border-border/60 shrink-0">
           <img
             src={persona.avatar}
@@ -209,7 +209,7 @@ function AssessmentCard({
       </div>
 
       {/* Assessment content */}
-      <div className="px-12 sm:px-14 py-8 max-h-[28rem] overflow-y-auto text-[14px] leading-[1.8] text-foreground/70 prose prose-sm prose-neutral [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground/90 [&_strong]:font-semibold [&_ul]:space-y-1.5 [&_ol]:space-y-1.5 [&_li]:text-foreground/65 [&_h1]:text-[15px] [&_h2]:text-[14px] [&_h3]:text-[13px] [&_p]:mb-3.5">
+      <div className="px-12 sm:px-20 py-12 max-h-[28rem] overflow-y-auto text-[14px] leading-[1.85] text-foreground/75 prose prose-sm prose-neutral max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground/90 [&_strong]:font-semibold [&_ul]:space-y-1.5 [&_ol]:space-y-1.5 [&_li]:text-foreground/65 [&_h1]:text-[15px] [&_h2]:text-[14px] [&_h3]:text-[13px] [&_p]:mb-4">
         <ReactMarkdown>{state.assessment ?? ""}</ReactMarkdown>
       </div>
 

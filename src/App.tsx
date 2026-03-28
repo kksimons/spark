@@ -4,6 +4,7 @@ import { Header } from "./components/Header";
 import { LandingInput } from "./components/LandingInput";
 import { EvaluationView } from "./components/EvaluationView";
 import { CollapsibleSidebar } from "./components/CollapsibleSidebar";
+import { Toaster, toast } from "sonner";
 
 export const PERSONAS: Persona[] = [
   { id: "dayee", name: "Dayee", department: "Cybersecurity", role: "Security Analyst", icon: "shield", avatar: "/dayee.png" },
@@ -222,7 +223,7 @@ export default function App() {
             break;
 
           case "error":
-            setError(data.content ?? "An error occurred");
+            toast.error(data.content ?? "An error occurred");
             setPhase("idle");
             es.close();
             break;
@@ -230,12 +231,12 @@ export default function App() {
       };
 
       es.onerror = () => {
-        setError("Connection lost. Please refresh.");
+        toast.error("Connection lost. Please refresh.");
         setPhase("idle");
         es.close();
       };
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
       setPhase("idle");
     }
   }, [resetState]);
@@ -247,6 +248,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Toaster position="top-center" />
       <Header
         onNewSession={handleNewSession}
         showNew={activeSession !== null}

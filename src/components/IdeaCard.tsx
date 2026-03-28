@@ -13,7 +13,7 @@ export function IdeaCard({ idea }: { idea: string }) {
     >
       <button
         onClick={() => setCollapsed((c) => !c)}
-        className="w-full text-left bg-white border border-border/60 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+        className="inline-block text-left shrink-0 bg-white border border-border/60 shadow-lg hover:shadow-xl transition-shadow cursor-pointer max-w-xl group rounded-2xl"
       >
         <AnimatePresence mode="wait" initial={false}>
           {collapsed ? (
@@ -22,14 +22,11 @@ export function IdeaCard({ idea }: { idea: string }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-center gap-3 px-5 py-3"
+              className="flex items-center justify-center p-3.5 bg-white rounded-full shadow-sm"
             >
-              <div className="w-7 h-7 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
-                <Lightbulb className="w-3.5 h-3.5 text-accent" />
+              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/20 transition-colors">
+                <Lightbulb className="w-5 h-5 text-accent" />
               </div>
-              <p className="text-[13px] text-muted-foreground truncate">
-                {idea}
-              </p>
             </motion.div>
           ) : (
             <motion.div
@@ -37,9 +34,9 @@ export function IdeaCard({ idea }: { idea: string }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-start gap-4 px-8 py-6"
+              className="flex items-start gap-4 px-8 py-6 rounded-2xl"
             >
-              <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
                 <Lightbulb className="w-4 h-4 text-accent" />
               </div>
               <div>
