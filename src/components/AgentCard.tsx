@@ -209,7 +209,7 @@ function AssessmentCard({
       </div>
 
       {/* Assessment content */}
-      <div className="px-12 sm:px-20 py-12 max-h-[28rem] overflow-y-auto text-[14px] leading-[1.85] text-foreground/75 prose prose-sm prose-neutral max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground/90 [&_strong]:font-semibold [&_ul]:space-y-1.5 [&_ol]:space-y-1.5 [&_li]:text-foreground/65 [&_h1]:text-[15px] [&_h2]:text-[14px] [&_h3]:text-[13px] [&_p]:mb-4">
+      <div className="px-8 sm:px-14 py-8 max-h-[36rem] overflow-y-auto text-[15px] leading-[1.75] text-foreground/85 prose prose-sm prose-neutral max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground [&_strong]:font-semibold [&_ul]:space-y-2 [&_ol]:space-y-2 [&_li]:text-foreground/80 [&_h1]:text-[20px] [&_h1]:font-bold [&_h2]:text-[17px] [&_h2]:font-bold [&_h3]:text-[15px] [&_h3]:font-semibold [&_p]:mb-4 [&_ul]:my-3 [&_ol]:my-3">
         <ReactMarkdown>{state.assessment ?? ""}</ReactMarkdown>
       </div>
 

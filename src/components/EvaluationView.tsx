@@ -60,7 +60,7 @@ export function EvaluationView({
       <div className="flex-1 flex flex-col items-center px-6 sm:px-8 mt-8">
         {/* Completed agents */}
         {completedAgents.length > 0 && (
-          <div className="w-full max-w-lg space-y-2 mb-6">
+          <div className="w-full max-w-3xl space-y-3 mb-8">
             {completedAgents.map((agent, i) => {
               const persona = personaMap[agent.personaId];
               if (!persona) return null;
@@ -82,7 +82,7 @@ export function EvaluationView({
           {activeAgent && personaMap[activeAgent.personaId] && (
             <motion.div
               key={activeAgent.personaId}
-              className="w-full max-w-lg"
+              className="w-full max-w-3xl"
             >
               <AgentCard
                 persona={personaMap[activeAgent.personaId]}
@@ -108,7 +108,7 @@ export function EvaluationView({
         {/* Discussion */}
         {(phase === "discussion" || phase === "synthesis" || phase === "complete") &&
           discussionMsgs.length > 0 && (
-            <div className="w-full max-w-lg mt-6">
+            <div className="w-full max-w-3xl mt-10">
               <DiscussionSection
                 messages={discussionMsgs}
                 personaMap={personaMap}
@@ -131,7 +131,7 @@ export function EvaluationView({
 
         {/* Synthesis */}
         {synthesis && (
-          <div className="w-full max-w-lg mt-6 mb-10">
+          <div className="w-full max-w-3xl mt-10 mb-16">
             <SynthesisCard content={synthesis} />
           </div>
         )}

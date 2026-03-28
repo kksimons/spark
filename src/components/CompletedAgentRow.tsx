@@ -20,7 +20,7 @@ export function CompletedAgentRow({
 }: CompletedAgentRowProps) {
   const [expanded, setExpanded] = useState(false);
   const preview =
-    state.assessment?.replace(/[#*_\-\n]+/g, " ").slice(0, 120) ?? "";
+    state.assessment?.replace(/[#*_\-\n]+/g, " ").slice(0, 100) ?? "";
 
   return (
     <motion.div
@@ -31,14 +31,14 @@ export function CompletedAgentRow({
       <button
         onClick={() => setExpanded((e) => !e)}
         className={cn(
-          "w-full text-left bg-white border rounded-xl px-4 py-3 transition-all hover:shadow-sm",
+          "w-full text-left bg-white border rounded-xl px-6 py-4 transition-all hover:shadow-sm",
           expanded
             ? "border-accent/20 shadow-[0_2px_16px_rgba(61,155,143,0.08)]"
             : "border-border/60"
         )}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg overflow-hidden border border-border/60 shrink-0">
+          <div className="w-9 h-9 rounded-lg overflow-hidden border border-border/60 shrink-0">
             <img
               src={persona.avatar}
               alt={persona.name}
@@ -55,7 +55,7 @@ export function CompletedAgentRow({
               </span>
             </div>
             {!expanded && (
-              <p className="text-xs text-muted-foreground truncate mt-0.5">
+              <p className="text-[12px] text-muted-foreground truncate mt-1">
                 {preview}...
               </p>
             )}
@@ -78,16 +78,16 @@ export function CompletedAgentRow({
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="bg-white border border-t-0 border-border/60 rounded-b-xl -mt-2 pt-4 px-4 pb-3 ml-11">
-              <div className="text-[13px] leading-[1.7] text-foreground/80 prose prose-sm prose-neutral [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground [&_strong]:font-semibold [&_p]:mb-2">
+            <div className="bg-white border border-t-0 border-border/60 rounded-b-xl -mt-3 px-8 sm:px-12 py-6">
+              <div className="max-h-[32rem] overflow-y-auto text-[14px] leading-[1.75] text-foreground/85 prose prose-sm prose-neutral max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_strong]:text-foreground [&_strong]:font-semibold [&_p]:mb-3 [&_ul]:space-y-2 [&_ul]:my-3 [&_ol]:space-y-2 [&_ol]:my-3 [&_li]:text-foreground/80 [&_h1]:text-[18px] [&_h1]:font-bold [&_h2]:text-[16px] [&_h2]:font-bold [&_h3]:text-[14px] [&_h3]:font-semibold">
                 <ReactMarkdown>{state.assessment ?? ""}</ReactMarkdown>
               </div>
               {state.followup && (
-                <div className="mt-3 px-3 py-2 bg-accent/5 border border-accent/10 rounded-lg">
-                  <p className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1">
+                <div className="mt-5 px-5 py-4 bg-accent/5 border border-accent/10 rounded-lg">
+                  <p className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1.5">
                     Updated take
                   </p>
-                  <p className="text-xs text-foreground/80 leading-relaxed">
+                  <p className="text-[13px] text-foreground/70 leading-[1.75]">
                     {state.followup}
                   </p>
                 </div>

@@ -187,10 +187,10 @@ export default function App() {
           case "agent_done":
             setActiveAgent((current) => {
               if (current) {
-                setCompletedAgents((prev) => [
-                  ...prev,
-                  { ...current, phase: "done" },
-                ]);
+                setCompletedAgents((prev) => {
+                  if (prev.some((a) => a.personaId === current.personaId)) return prev;
+                  return [...prev, { ...current, phase: "done" }];
+                });
               }
               return null;
             });
@@ -203,10 +203,10 @@ export default function App() {
 
           case "discussion_message":
             if (data.persona && data.content) {
-              setDiscussionMsgs((prev) => [
-                ...prev,
-                { personaId: data.persona!, content: data.content! },
-              ]);
+              setDiscussionMsgs((prev) => {
+                if (prev.some((m) => m.personaId === data.persona)) return prev;
+                return [...prev, { personaId: data.persona!, content: data.content! }];
+              });
             }
             break;
 
