@@ -1,0 +1,83 @@
+- generic [ref=e3]:
+  - region "Notifications alt+T"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - button [ref=e48]:
+        - img [ref=e49]
+      - generic [ref=e6]:
+        - img [ref=e8]
+        - generic [ref=e10]: ENMAX Spark
+  - main [ref=e12]:
+    - generic [ref=e52]:
+      - generic [ref=e55]:
+        - generic [ref=e267]:
+          - button "Dayee Dayee Cybersecurity That's an interesting idea for improving transparency and resource planning within ENMAX! From a sec..." [ref=e269]:
+            - generic [ref=e270]:
+              - img "Dayee" [ref=e272]
+              - generic [ref=e273]:
+                - generic [ref=e274]:
+                  - generic [ref=e275]: Dayee
+                  - generic [ref=e276]: Cybersecurity
+                - paragraph [ref=e277]: That's an interesting idea for improving transparency and resource planning within ENMAX! From a sec...
+              - img [ref=e278]
+          - button "Nathan Nathan Digital Experience This is a great idea for improving transparency and resource planning within ENMAX! Let's break down..." [ref=e374]:
+            - generic [ref=e375]:
+              - img "Nathan" [ref=e377]
+              - generic [ref=e378]:
+                - generic [ref=e379]:
+                  - generic [ref=e380]: Nathan
+                  - generic [ref=e381]: Digital Experience
+                - paragraph [ref=e382]: This is a great idea for improving transparency and resource planning within ENMAX! Let's break down...
+              - img [ref=e383]
+          - button "Dana Dana Enterprise Architecture That's a great idea for improving transparency and resource allocation across ENMAX! Let's break dow..." [ref=e471]:
+            - generic [ref=e472]:
+              - img "Dana" [ref=e474]
+              - generic [ref=e475]:
+                - generic [ref=e476]:
+                  - generic [ref=e477]: Dana
+                  - generic [ref=e478]: Enterprise Architecture
+                - paragraph [ref=e479]: That's a great idea for improving transparency and resource allocation across ENMAX! Let's break dow...
+              - img [ref=e480]
+        - generic [ref=e487]:
+          - paragraph [ref=e491]: Lalindra
+          - img "Lalindra" [ref=e494]
+          - generic [ref=e495]:
+            - paragraph [ref=e496]: UX/UI Designer
+            - paragraph [ref=e497]: Design
+          - generic [ref=e500]: ENMAX · Design
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - img [ref=e85]
+            - generic [ref=e88]: Building Spec...
+          - heading "ENMAX Spark Spec" [level=1] [ref=e89]
+          - paragraph [ref=e90]: I want to create a dashboard that exposes my team's capacity to the rest of the organization so they can see what we're working on, the release schedule, when they'd be able to schedule us for more work at the soonest, etc.
+          - generic [ref=e91]: Agents are working on this
+        - generic [ref=e96]:
+          - generic [ref=e99]:
+            - generic [ref=e100]: 👥
+            - heading "Stakeholder Outreach & Next Steps" [level=2] [ref=e102]
+          - generic [ref=e111]:
+            - generic [ref=e112]: ⚖️
+            - heading "Verdict" [level=2] [ref=e114]
+          - generic [ref=e123]:
+            - generic [ref=e124]: 🏢
+            - heading "Departments Involved" [level=2] [ref=e126]
+          - generic [ref=e135]:
+            - generic [ref=e136]: 🚩
+            - heading "Recommended Approach" [level=2] [ref=e138]
+          - generic [ref=e147]:
+            - generic [ref=e148]: 🖥️
+            - heading "Technical Architecture" [level=2] [ref=e150]
+          - generic [ref=e159]:
+            - generic [ref=e160]: 🛡️
+            - heading "Security & Compliance" [level=2] [ref=e162]
+          - generic [ref=e171]:
+            - generic [ref=e172]: 🎨
+            - heading "Design & User Experience" [level=2] [ref=e174]
+          - generic [ref=e183]:
+            - generic [ref=e184]: ⚠️
+            - heading "Key Risks & Mitigations" [level=2] [ref=e186]
+          - generic [ref=e195]:
+            - generic [ref=e196]: 💰
+            - heading "Estimated Effort & Cost" [level=2] [ref=e198]

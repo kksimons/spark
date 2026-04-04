@@ -1,0 +1,83 @@
+- generic [ref=e3]:
+  - region "Notifications alt+T"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - button [ref=e48]:
+        - img [ref=e49]
+      - generic [ref=e6]:
+        - img [ref=e8]
+        - generic [ref=e10]: ENMAX Spark
+  - main [ref=e12]:
+    - generic [ref=e51]:
+      - button "The Idea I want to create a dashboard that exposes my team's capacity to the rest of the organization so they can see what we're working on, the release schedule, when they'd be able to schedule us for more work at the soonest, etc." [ref=e54] [cursor=pointer]:
+        - generic [ref=e55]:
+          - img [ref=e57]
+          - generic [ref=e59]:
+            - paragraph [ref=e60]: The Idea
+            - paragraph [ref=e61]: I want to create a dashboard that exposes my team's capacity to the rest of the organization so they can see what we're working on, the release schedule, when they'd be able to schedule us for more work at the soonest, etc.
+      - generic [ref=e62]:
+        - button "Dayee Dayee Cybersecurity This is an interesting idea with potential to improve transparency and resource planning within ENMA..." [ref=e175]:
+          - generic [ref=e176]:
+            - img "Dayee" [ref=e178]
+            - generic [ref=e179]:
+              - generic [ref=e180]:
+                - generic [ref=e181]: Dayee
+                - generic [ref=e182]: Cybersecurity
+              - paragraph [ref=e183]: This is an interesting idea with potential to improve transparency and resource planning within ENMA...
+            - img [ref=e184]
+        - generic [ref=e510]:
+          - generic [ref=e511]:
+            - img "Nathan" [ref=e513]
+            - generic [ref=e514]:
+              - paragraph [ref=e515]: Nathan
+              - paragraph [ref=e516]: Digital Experience
+          - generic [ref=e517]:
+            - paragraph [ref=e518]: This is a great idea for improving transparency and resource planning within ENMAX! Let's break down the infrastructure and platform considerations for your team capacity dashboard.
+            - list [ref=e519]:
+              - listitem [ref=e520]:
+                - paragraph [ref=e521]:
+                  - strong [ref=e522]: "Recommended Hosting Architecture on Azure:"
+                  - text: For a dashboard displaying internal team capacity, an Azure Static Web App is an excellent choice. This would host your front-end (the dashboard itself, built with a modern web framework) and can easily integrate with Azure Functions for any backend logic or data retrieval. This keeps things simple and cost-effective.
+              - listitem [ref=e523]:
+                - paragraph [ref=e524]:
+                  - strong [ref=e525]: "Estimated Monthly Infrastructure Cost Range:"
+                  - text: For a Static Web App with a few Azure Functions, your monthly costs would likely be in the
+                  - strong [ref=e526]: $10 - $50 range
+                  - text: . This is very low, as Static Web Apps have a generous free tier, and Functions are charged based on execution and memory, which for internal use would be minimal.
+              - listitem [ref=e527]:
+                - paragraph [ref=e528]:
+                  - strong [ref=e529]: "Accessibility Requirements:"
+                  - text: Since this is an internal tool, the primary users are ENMAX employees. While not legally mandated for WCAG 2.1 AA like public-facing sites, it's still best practice to aim for good accessibility. This ensures everyone, including those with disabilities, can easily use the dashboard. Focus on clear navigation, readable fonts, and keyboard operability.
+              - listitem [ref=e530]:
+                - paragraph [ref=e531]:
+                  - strong [ref=e532]: "Deployment Strategy and Environments Needed:"
+                  - text: "We'd set up a CI/CD pipeline using Azure DevOps. This would automatically build and deploy your dashboard whenever changes are committed to a code repository. We'd need at least two environments:"
+                - list [ref=e533]:
+                  - listitem [ref=e534]:
+                    - strong [ref=e535]: "Development:"
+                    - text: For developers to test new features.
+                  - listitem [ref=e536]:
+                    - strong [ref=e537]: "Production:"
+                    - text: The live dashboard used by the organization.
+                  - listitem [ref=e538]:
+                    - text: A
+                    - strong [ref=e539]: Staging
+                    - text: environment could be added for UAT (User Acceptance Testing) before going live, if desired.
+              - listitem [ref=e540]:
+                - paragraph [ref=e541]:
+                  - strong [ref=e542]: "Monitoring and Observability Setup:"
+                  - text: We'd use Azure Application Insights, integrated with your Static Web App and Functions. This would give us insights into usage patterns, performance metrics, and any errors, allowing us to quickly identify and resolve issues.
+              - listitem [ref=e543]:
+                - paragraph [ref=e544]:
+                  - strong [ref=e545]: "Timeline Estimate for Infrastructure Provisioning:"
+                  - text: Setting up the core Azure Static Web App, Function App, and CI/CD pipeline would be relatively quick, likely
+                  - strong [ref=e546]: 1-2 weeks
+                  - text: once we have the details of the data source and dashboard design.
+            - paragraph [ref=e547]: This approach offers a scalable, cost-effective, and maintainable solution for your team's capacity dashboard.
+    - button "Spec 1/9 sections" [ref=e209]:
+      - generic [ref=e87]:
+        - img [ref=e88]
+        - img [ref=e92]
+      - generic [ref=e95]:
+        - paragraph [ref=e96]: Spec
+        - paragraph [ref=e97]: 1/9 sections

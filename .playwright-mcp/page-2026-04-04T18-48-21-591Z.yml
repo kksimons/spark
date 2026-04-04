@@ -1,0 +1,120 @@
+- generic [ref=e3]:
+  - region "Notifications alt+T"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - button [ref=e48]:
+        - img [ref=e49]
+      - generic [ref=e6]:
+        - img [ref=e8]
+        - generic [ref=e10]: ENMAX Spark
+  - main [ref=e12]:
+    - generic [ref=e52]:
+      - generic [ref=e55]:
+        - button "Dayee Dayee Cybersecurity That's an interesting idea for improving transparency and resource planning within ENMAX! From a sec..." [ref=e269]:
+          - generic [ref=e270]:
+            - img "Dayee" [ref=e272]
+            - generic [ref=e273]:
+              - generic [ref=e274]:
+                - generic [ref=e275]: Dayee
+                - generic [ref=e276]: Cybersecurity
+              - paragraph [ref=e277]: That's an interesting idea for improving transparency and resource planning within ENMAX! From a sec...
+            - img [ref=e278]
+        - generic [ref=e300]:
+          - generic [ref=e301]:
+            - img "Nathan" [ref=e303]
+            - generic [ref=e304]:
+              - paragraph [ref=e305]: Nathan
+              - paragraph [ref=e306]: Digital Experience
+          - generic [ref=e307]:
+            - paragraph [ref=e308]: This is a great idea for improving transparency and resource planning within ENMAX! Let's break down how we could bring this to life from an infrastructure and platform perspective.
+            - list [ref=e309]:
+              - listitem [ref=e310]:
+                - paragraph [ref=e311]:
+                  - strong [ref=e312]: "Recommended Hosting Architecture on Azure:"
+                - list [ref=e313]:
+                  - listitem [ref=e314]: I'd suggest an Azure Static Web App. This is perfect for dashboards because it handles the front-end (what users see) efficiently. You could use a modern web framework like React or Vue.js to build the dashboard itself.
+                  - listitem [ref=e315]: For the data, we'd likely use an Azure Function App acting as an API. This function would securely connect to your team's existing data sources (e.g., project management tools, Excel files, databases) to pull the capacity information. It's serverless, meaning it only runs when requested, which is very cost-effective.
+                  - listitem [ref=e316]: This setup would be internal-only, accessible via ENMAX's internal network or VPN, ensuring data security.
+              - listitem [ref=e317]:
+                - paragraph [ref=e318]:
+                  - strong [ref=e319]: "Estimated Monthly Infrastructure Cost Range:"
+                - list [ref=e320]:
+                  - listitem [ref=e321]:
+                    - text: Very low, likely
+                    - strong [ref=e322]: $10 - $50 per month
+                    - text: . Static Web Apps and Function Apps are incredibly cost-efficient, especially for internal tools with predictable usage. The main costs would come from data storage or any specific database connections.
+              - listitem [ref=e323]:
+                - paragraph [ref=e324]:
+                  - strong [ref=e325]: "Accessibility Requirements:"
+                - list [ref=e326]:
+                  - listitem [ref=e327]:
+                    - text: Even though it's internal, we should aim for good accessibility. I recommend adhering to
+                    - strong [ref=e328]: WCAG 2.1 AA
+                    - text: guidelines where practical. This ensures all employees, regardless of ability, can effectively use the dashboard.
+              - listitem [ref=e329]:
+                - paragraph [ref=e330]:
+                  - strong [ref=e331]: "Deployment Strategy and Environments Needed:"
+                - list [ref=e332]:
+                  - listitem [ref=e333]: We'd set up a standard CI/CD pipeline using Azure DevOps.
+                  - listitem [ref=e334]:
+                    - strong [ref=e335]: "Environments:"
+                    - list [ref=e336]:
+                      - listitem [ref=e337]:
+                        - strong [ref=e338]: "Dev:"
+                        - text: For developers to test changes.
+                      - listitem [ref=e339]:
+                        - strong [ref=e340]: "UAT (User Acceptance Testing):"
+                        - text: For your team and other stakeholders to review and approve new features before wider release.
+                      - listitem [ref=e341]:
+                        - strong [ref=e342]: "Prod:"
+                        - text: The live dashboard accessible to the organization.
+              - listitem [ref=e343]:
+                - paragraph [ref=e344]:
+                  - strong [ref=e345]: "Monitoring and Observability Setup:"
+                - list [ref=e346]:
+                  - listitem [ref=e347]: We'd integrate Azure Application Insights to monitor performance, identify errors, and track usage patterns. This helps us ensure the dashboard is always available and performing well. Azure Monitor would also be used for overall resource health.
+              - listitem [ref=e348]:
+                - paragraph [ref=e349]:
+                  - strong [ref=e350]: "Timeline Estimate for Infrastructure Provisioning:"
+                - list [ref=e351]:
+                  - listitem [ref=e352]:
+                    - text: Setting up the basic Azure Static Web App, Function App, and CI/CD pipeline would likely take
+                    - strong [ref=e353]: 1-2 weeks
+                    - text: . This doesn't include the time to develop the dashboard itself or integrate with your team's specific data sources.
+            - paragraph [ref=e354]: This approach gives us a secure, scalable, and cost-effective solution for your capacity dashboard.
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - img [ref=e85]
+            - generic [ref=e88]: Building Spec...
+          - heading "ENMAX Spark Spec" [level=1] [ref=e89]
+          - paragraph [ref=e90]: I want to create a dashboard that exposes my team's capacity to the rest of the organization so they can see what we're working on, the release schedule, when they'd be able to schedule us for more work at the soonest, etc.
+          - generic [ref=e91]: Agents are working on this
+        - generic [ref=e96]:
+          - generic [ref=e99]:
+            - generic [ref=e100]: 👥
+            - heading "Stakeholder Outreach & Next Steps" [level=2] [ref=e102]
+          - generic [ref=e111]:
+            - generic [ref=e112]: ⚖️
+            - heading "Verdict" [level=2] [ref=e114]
+          - generic [ref=e123]:
+            - generic [ref=e124]: 🏢
+            - heading "Departments Involved" [level=2] [ref=e126]
+          - generic [ref=e135]:
+            - generic [ref=e136]: 🚩
+            - heading "Recommended Approach" [level=2] [ref=e138]
+          - generic [ref=e147]:
+            - generic [ref=e148]: 🖥️
+            - heading "Technical Architecture" [level=2] [ref=e150]
+          - generic [ref=e159]:
+            - generic [ref=e160]: 🛡️
+            - heading "Security & Compliance" [level=2] [ref=e162]
+          - generic [ref=e171]:
+            - generic [ref=e172]: 🎨
+            - heading "Design & User Experience" [level=2] [ref=e174]
+          - generic [ref=e183]:
+            - generic [ref=e184]: ⚠️
+            - heading "Key Risks & Mitigations" [level=2] [ref=e186]
+          - generic [ref=e195]:
+            - generic [ref=e196]: 💰
+            - heading "Estimated Effort & Cost" [level=2] [ref=e198]

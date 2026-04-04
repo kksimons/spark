@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import type { Session, Persona, AgentState, DiscussionMsg, SSEEvent } from "./types";
+import type { Session, Persona, AgentState, DiscussionMsg, SSEEvent, SpecSection } from "./types";
 import { Header } from "./components/Header";
 import { LandingInput } from "./components/LandingInput";
 import { EvaluationView } from "./components/EvaluationView";
@@ -26,6 +26,7 @@ export default function App() {
   const [activeAgent, setActiveAgent] = useState<AgentState | null>(null);
   const [discussionMsgs, setDiscussionMsgs] = useState<DiscussionMsg[]>([]);
   const [synthesis, setSynthesis] = useState<string | null>(null);
+  const [specSections, setSpecSections] = useState<SpecSection[]>([]);
   const [phase, setPhase] = useState<"idle" | "agents" | "discussion" | "synthesis" | "complete">("idle");
   const [isReplay, setIsReplay] = useState(false);
 
@@ -36,6 +37,7 @@ export default function App() {
     setActiveAgent(null);
     setDiscussionMsgs([]);
     setSynthesis(null);
+    setSpecSections([]);
     setPhase("idle");
     setIsReplay(false);
     eventSourceRef.current?.close();
@@ -74,6 +76,11 @@ export default function App() {
         setCompletedAgents(agents);
         setDiscussionMsgs(disc);
         setSynthesis(syn);
+
+        if (syn) {
+          setSpecSections(parseMarkdownToSections(syn).map((s) => ({ ...s, status: "complete" as const })));
+        }
+
         setPhase("complete");
       }
     } catch {
@@ -211,6 +218,45 @@ export default function App() {
             if (data.content) setSynthesis(data.content);
             break;
 
+          case "spec_skeleton":
+            if (data.sections) {
+              setSpecSections(
+                (data.sections as SpecSection[]).map((s) => ({
+                  ...s,
+                  status: "skeleton",
+                }))
+              );
+            }
+            break;
+
+          case "spec_section":
+            if (data.id) {
+              const isSynthesisPhase = phase === "synthesis" || phase === "complete";
+              setSpecSections((prev) =>
+                prev.map((s) => {
+                  if (s.id !== data.id) return s;
+                  const incoming = data.content ?? "";
+
+                  if (isSynthesisPhase) {
+                    return {
+                      ...s,
+                      content: incoming,
+                      status: (data.status as SpecSection["status"]) ?? "complete",
+                    };
+                  }
+                  const newContent = s.content
+                    ? `${s.content}\n\n---\n\n${incoming}`
+                    : incoming;
+                  return {
+                    ...s,
+                    content: newContent,
+                    status: (data.status as SpecSection["status"]) ?? "complete",
+                  };
+                })
+              );
+            }
+            break;
+
           case "evaluation_complete":
             setPhase("complete");
             setActiveSession((prev) =>
@@ -258,7 +304,7 @@ export default function App() {
           }}
         />
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-hidden">
           {!activeSession ? (
             <LandingInput
               onSubmit={startEvaluation}
@@ -273,6 +319,7 @@ export default function App() {
               activeAgent={activeAgent}
               discussionMsgs={discussionMsgs}
               synthesis={synthesis}
+              specSections={specSections}
               phase={phase}
               isReplay={isReplay}
               onAnswer={handleAnswer}
@@ -282,4 +329,51 @@ export default function App() {
       </div>
     </div>
   );
+}
+
+function parseMarkdownToSections(markdown: string): SpecSection[] {
+  const lines = markdown.split("\n");
+  const sections: SpecSection[] = [];
+  let currentTitle = "";
+  let currentContent: string[] = [];
+  let order = 0;
+
+  const flush = () => {
+    if (currentTitle) {
+      const lower = currentTitle.toLowerCase();
+      let icon = "file-text";
+      if (lower.includes("verdict")) icon = "gavel";
+      else if (lower.includes("stakeholder")) icon = "users";
+      else if (lower.includes("department")) icon = "building";
+      else if (lower.includes("approach")) icon = "route";
+      else if (lower.includes("architecture") || lower.includes("technical")) icon = "server";
+      else if (lower.includes("security") || lower.includes("compliance")) icon = "shield";
+      else if (lower.includes("design") || lower.includes("user")) icon = "palette";
+      else if (lower.includes("risk")) icon = "alert-triangle";
+      else if (lower.includes("effort") || lower.includes("cost")) icon = "dollar-sign";
+
+      sections.push({
+        id: lower.replace(/[^a-z0-9]/g, "-").slice(0, 30),
+        title: currentTitle,
+        icon,
+        content: currentContent.join("\n").trim(),
+        order,
+      });
+      order++;
+    }
+  };
+
+  for (const line of lines) {
+    const match = line.match(/^# (.+)$/);
+    if (match) {
+      flush();
+      currentTitle = match[1].trim();
+      currentContent = [];
+    } else {
+      currentContent.push(line);
+    }
+  }
+  flush();
+
+  return sections;
 }

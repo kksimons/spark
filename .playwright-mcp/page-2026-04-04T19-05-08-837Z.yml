@@ -1,0 +1,316 @@
+- generic [ref=e3]:
+  - region "Notifications alt+T"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - button [ref=e48]:
+        - img [ref=e49]
+      - generic [ref=e6]:
+        - img [ref=e8]
+        - generic [ref=e10]: ENMAX Spark
+  - main [ref=e12]:
+    - generic [ref=e51]:
+      - button "The Idea I want to create a dashboard that exposes my team's capacity to the rest of the organization so they can see what we're working on, the release schedule, when they'd be able to schedule us for more work at the soonest, etc." [ref=e54] [cursor=pointer]:
+        - generic [ref=e55]:
+          - img [ref=e57]
+          - generic [ref=e59]:
+            - paragraph [ref=e60]: The Idea
+            - paragraph [ref=e61]: I want to create a dashboard that exposes my team's capacity to the rest of the organization so they can see what we're working on, the release schedule, when they'd be able to schedule us for more work at the soonest, etc.
+      - generic [ref=e62]:
+        - button "Dayee Dayee Cybersecurity This is an interesting idea with potential to improve transparency and resource planning within ENMA..." [ref=e175]:
+          - generic [ref=e176]:
+            - img "Dayee" [ref=e178]
+            - generic [ref=e179]:
+              - generic [ref=e180]:
+                - generic [ref=e181]: Dayee
+                - generic [ref=e182]: Cybersecurity
+              - paragraph [ref=e183]: This is an interesting idea with potential to improve transparency and resource planning within ENMA...
+            - img [ref=e184]
+        - generic [ref=e191]:
+          - paragraph [ref=e195]: Nathan
+          - img "Nathan" [ref=e198]
+          - generic [ref=e199]:
+            - paragraph [ref=e200]: Infrastructure & Platform Lead
+            - paragraph [ref=e201]: Digital Experience
+          - generic [ref=e208]: ENMAX · Digital Experience
+    - button "Spec 1/9 sections" [active] [ref=e209]:
+      - generic [ref=e87]:
+        - img [ref=e88]
+        - img [ref=e92]
+      - generic [ref=e95]:
+        - paragraph [ref=e96]: Spec
+        - paragraph [ref=e97]: 1/9 sections
+    - generic [ref=e211]:
+      - generic [ref=e212]:
+        - generic [ref=e213]:
+          - img [ref=e214]
+          - generic [ref=e217]: Building Spec...
+          - generic [ref=e218]: 1/9 sections
+        - button [ref=e219]:
+          - img [ref=e220]
+      - generic [ref=e226]:
+        - generic [ref=e227]:
+          - generic [ref=e228]:
+            - img [ref=e229]
+            - generic [ref=e232]: Building Spec...
+          - heading "ENMAX Spark Spec" [level=1] [ref=e233]
+          - paragraph [ref=e234]: I want to create a dashboard that exposes my team's capacity to the rest of the organization so they can see what we're working on, the release schedule, when they'd be able to schedule us for more work at the soonest, etc.
+          - generic [ref=e235]: Agents are working on this
+        - generic [ref=e240]:
+          - generic [ref=e243]:
+            - generic [ref=e244]: 👥
+            - heading "Stakeholder Outreach & Next Steps" [level=2] [ref=e246]
+          - generic [ref=e255]:
+            - generic [ref=e256]: ⚖️
+            - heading "Verdict" [level=2] [ref=e258]
+          - generic [ref=e267]:
+            - generic [ref=e268]: 🏢
+            - heading "Departments Involved" [level=2] [ref=e270]
+          - generic [ref=e279]:
+            - generic [ref=e280]: 🚩
+            - heading "Recommended Approach" [level=2] [ref=e282]
+          - generic [ref=e291]:
+            - generic [ref=e292]: 🖥️
+            - heading "Technical Architecture" [level=2] [ref=e294]
+          - generic [ref=e301]:
+            - generic [ref=e303]:
+              - generic [ref=e304]: 🛡️
+              - heading "Security & Compliance" [level=2] [ref=e306]
+            - generic [ref=e308]:
+              - paragraph [ref=e309]: "This is an interesting idea with potential to improve transparency and resource planning within ENMAX. From a security perspective, here's my assessment:"
+              - paragraph [ref=e310]:
+                - strong [ref=e311]: "Key Considerations & Recommendations:"
+              - list [ref=e312]:
+                - listitem [ref=e313]:
+                  - paragraph [ref=e314]:
+                    - strong [ref=e315]: "Authentication & Authorization:"
+                    - text: This is paramount. All access to the dashboard
+                    - strong [ref=e316]: must
+                    - text: be integrated with
+                    - strong [ref=e317]: Microsoft Entra ID (formerly Azure AD)
+                    - text: . We'll implement
+                    - strong [ref=e318]: Conditional Access Policies
+                    - text: to enforce strong authentication (e.g., multi-factor authentication for all users) and restrict access based on device compliance or network location. Authorization should be granular, ensuring users only see information relevant to their role – for example, some might see high-level project statuses, while managers might see more detailed capacity breakdowns.
+                - listitem [ref=e319]:
+                  - paragraph [ref=e320]:
+                    - strong [ref=e321]: "Data Sensitivity & Classification:"
+                    - text: The data exposed on this dashboard, even if seemingly innocuous, could be sensitive. Information about team capacity, project timelines, and future work can reveal strategic priorities, resource allocation, and potential vulnerabilities. I'd classify this data as
+                    - strong [ref=e322]: "\"Internal Use Only\""
+                    - text: at a minimum, possibly
+                    - strong [ref=e323]: "\"Confidential\""
+                    - text: depending on the level of detail. We need to ensure no Personally Identifiable Information (PII) or critical infrastructure details are exposed.
+                - listitem [ref=e324]:
+                  - paragraph [ref=e325]:
+                    - strong [ref=e326]: "Network Security:"
+                    - text: The dashboard should be hosted within our secure Azure environment, ideally behind an
+                    - strong [ref=e327]: Azure Application Gateway with Web Application Firewall (WAF)
+                    - text: to protect against common web vulnerabilities. Network access should be restricted to internal ENMAX networks or via secure VPN connections.
+                - listitem [ref=e328]:
+                  - paragraph [ref=e329]:
+                    - strong [ref=e330]: "Azure Security Services:"
+                  - list [ref=e331]:
+                    - listitem [ref=e332]:
+                      - strong [ref=e333]: "Microsoft Entra ID:"
+                      - text: For all authentication and authorization.
+                    - listitem [ref=e334]:
+                      - strong [ref=e335]: "Azure Conditional Access:"
+                      - text: To enforce access policies.
+                    - listitem [ref=e336]:
+                      - strong [ref=e337]: "Azure Application Gateway (with WAF):"
+                      - text: For front-end protection.
+                    - listitem [ref=e338]:
+                      - strong [ref=e339]: "Azure Monitor & Azure Sentinel:"
+                      - text: To log and monitor all access and activity for anomalies.
+                    - listitem [ref=e340]:
+                      - strong [ref=e341]: "Azure Key Vault:"
+                      - text: To securely store any secrets or connection strings the dashboard uses.
+                - listitem [ref=e342]:
+                  - paragraph [ref=e343]:
+                    - strong [ref=e344]: "Compliance Requirements:"
+                  - list [ref=e345]:
+                    - listitem [ref=e346]:
+                      - strong [ref=e347]: "Alberta PIPA:"
+                      - text: We must ensure no personal information of employees is inadvertently exposed.
+                    - listitem [ref=e348]:
+                      - strong [ref=e349]: "NERC CIP:"
+                      - text: While not directly a NERC CIP asset, the information
+                      - emphasis [ref=e350]: about
+                      - text: teams working on NERC CIP-related projects or systems could indirectly provide insight into critical infrastructure. We need to be careful about what details are shared.
+                    - listitem [ref=e351]:
+                      - strong [ref=e352]: "SOC 2:"
+                      - text: Our controls for data protection, access management, and monitoring will help satisfy SOC 2 requirements.
+              - paragraph [ref=e353]:
+                - strong [ref=e354]: "Risk Rating: Medium"
+              - paragraph [ref=e355]: The risk is medium because exposing internal operational details, even aggregated, could provide valuable intelligence to external threat actors or competitors if not properly secured. Insider threat is also a consideration if authorization isn't tightly controlled.
+              - paragraph [ref=e356]: "[After clarification]: Thanks for the additional detail. Knowing the specific data points and update frequency helps refine the security assessment."
+              - paragraph [ref=e357]: The dashboard's data, including sprint velocity and release dates, while not directly customer or critical infrastructure data, still represents sensitive internal operational information. Unauthorized access could expose team performance metrics and future project timelines, potentially impacting competitive advantage or internal planning. Therefore, strong access controls and data protection remain crucial.
+              - paragraph [ref=e358]: The daily API sync from Azure DevOps is a key integration point that requires secure configuration and monitoring.
+              - paragraph [ref=e359]: "Here's an updated look at the security considerations:"
+              - list [ref=e360]:
+                - listitem [ref=e361]:
+                  - strong [ref=e362]: "Authentication & Authorization:"
+                  - text: Absolutely, this must integrate with
+                  - strong [ref=e363]: Entra ID (formerly Azure AD)
+                  - text: . Role-based access control (RBAC) should be implemented to ensure only authorized ENMAX employees can view the dashboard, and potentially further restrict visibility based on job function if certain data is more sensitive.
+                - listitem [ref=e364]:
+                  - strong [ref=e365]: "Data Sensitivity & Handling:"
+                  - text: The data (sprint velocity, release dates) would be classified as
+                  - strong [ref=e366]: "\"Internal Use Only.\""
+                  - text: While not NERC CIP data, its exposure could still be detrimental. Data in transit (API sync) and at rest (dashboard storage) must be encrypted.
+                - listitem [ref=e367]:
+                  - strong [ref=e368]: "Network Security:"
+                  - text: The dashboard application and its backend (where data is stored) should reside within a secure Azure Virtual Network (VNet), protected by
+                  - strong [ref=e369]: Azure Firewall
+                  - text: and Network Security Groups (NSGs). Access to the API endpoint for daily updates must be highly restricted.
+                - listitem [ref=e370]:
+                  - strong [ref=e371]: "Azure Security Services:"
+                  - list [ref=e372]:
+                    - listitem [ref=e373]:
+                      - strong [ref=e374]: "Azure App Service/Container Apps:"
+                      - text: For hosting the dashboard, leveraging its built-in security features.
+                    - listitem [ref=e375]:
+                      - strong [ref=e376]: "Azure Key Vault:"
+                      - text: To securely store any API keys or connection strings needed for the Azure DevOps integration.
+                    - listitem [ref=e377]:
+                      - strong [ref=e378]: "Azure Monitor & Azure Sentinel:"
+                      - text: For logging, monitoring, and alerting on suspicious activities or access attempts.
+                    - listitem [ref=e379]:
+                      - strong [ref=e380]: "Microsoft Defender for Cloud:"
+                      - text: To provide continuous security posture management and threat protection for the Azure resources.
+                    - listitem [ref=e381]:
+                      - strong [ref=e382]: "Azure API Management:"
+                      - text: To secure and manage the API gateway for the Azure DevOps integration, enforcing policies and authentication.
+                - listitem [ref=e383]:
+                  - strong [ref=e384]: "Compliance Requirements:"
+                  - text: While not directly NERC CIP, general principles of
+                  - strong [ref=e385]: Alberta PIPA
+                  - text: regarding sensitive employee data (if team names are identifiable) and
+                  - strong [ref=e386]: SOC 2
+                  - text: for data integrity and confidentiality would apply. We'd need to ensure proper logging and audit trails are in place.
+                - listitem [ref=e387]:
+                  - strong [ref=e388]: "Risk Rating:"
+                  - strong [ref=e389]: Medium.
+                  - text: The risk isn't about critical infrastructure disruption, but rather the exposure of internal operational data, which could lead to reputational damage, competitive disadvantage, or internal misuse if not properly secured. The API integration adds a specific attack surface that needs careful attention.
+              - separator [ref=e390]
+              - paragraph [ref=e391]: "This is an interesting idea with potential to improve transparency and resource planning within ENMAX. From a security perspective, here's my assessment:"
+              - paragraph [ref=e392]:
+                - strong [ref=e393]: "Key Considerations & Recommendations:"
+              - list [ref=e394]:
+                - listitem [ref=e395]:
+                  - paragraph [ref=e396]:
+                    - strong [ref=e397]: "Authentication & Authorization:"
+                    - text: This is paramount. All access to the dashboard
+                    - strong [ref=e398]: must
+                    - text: be integrated with
+                    - strong [ref=e399]: Microsoft Entra ID (formerly Azure AD)
+                    - text: . We'll implement
+                    - strong [ref=e400]: Conditional Access Policies
+                    - text: to enforce strong authentication (e.g., multi-factor authentication for all users) and restrict access based on device compliance or network location. Authorization should be granular, ensuring users only see information relevant to their role – for example, some might see high-level project statuses, while managers might see more detailed capacity breakdowns.
+                - listitem [ref=e401]:
+                  - paragraph [ref=e402]:
+                    - strong [ref=e403]: "Data Sensitivity & Classification:"
+                    - text: The data exposed on this dashboard, even if seemingly innocuous, could be sensitive. Information about team capacity, project timelines, and future work can reveal strategic priorities, resource allocation, and potential vulnerabilities. I'd classify this data as
+                    - strong [ref=e404]: "\"Internal Use Only\""
+                    - text: at a minimum, possibly
+                    - strong [ref=e405]: "\"Confidential\""
+                    - text: depending on the level of detail. We need to ensure no Personally Identifiable Information (PII) or critical infrastructure details are exposed.
+                - listitem [ref=e406]:
+                  - paragraph [ref=e407]:
+                    - strong [ref=e408]: "Network Security:"
+                    - text: The dashboard should be hosted within our secure Azure environment, ideally behind an
+                    - strong [ref=e409]: Azure Application Gateway with Web Application Firewall (WAF)
+                    - text: to protect against common web vulnerabilities. Network access should be restricted to internal ENMAX networks or via secure VPN connections.
+                - listitem [ref=e410]:
+                  - paragraph [ref=e411]:
+                    - strong [ref=e412]: "Azure Security Services:"
+                  - list [ref=e413]:
+                    - listitem [ref=e414]:
+                      - strong [ref=e415]: "Microsoft Entra ID:"
+                      - text: For all authentication and authorization.
+                    - listitem [ref=e416]:
+                      - strong [ref=e417]: "Azure Conditional Access:"
+                      - text: To enforce access policies.
+                    - listitem [ref=e418]:
+                      - strong [ref=e419]: "Azure Application Gateway (with WAF):"
+                      - text: For front-end protection.
+                    - listitem [ref=e420]:
+                      - strong [ref=e421]: "Azure Monitor & Azure Sentinel:"
+                      - text: To log and monitor all access and activity for anomalies.
+                    - listitem [ref=e422]:
+                      - strong [ref=e423]: "Azure Key Vault:"
+                      - text: To securely store any secrets or connection strings the dashboard uses.
+                - listitem [ref=e424]:
+                  - paragraph [ref=e425]:
+                    - strong [ref=e426]: "Compliance Requirements:"
+                  - list [ref=e427]:
+                    - listitem [ref=e428]:
+                      - strong [ref=e429]: "Alberta PIPA:"
+                      - text: We must ensure no personal information of employees is inadvertently exposed.
+                    - listitem [ref=e430]:
+                      - strong [ref=e431]: "NERC CIP:"
+                      - text: While not directly a NERC CIP asset, the information
+                      - emphasis [ref=e432]: about
+                      - text: teams working on NERC CIP-related projects or systems could indirectly provide insight into critical infrastructure. We need to be careful about what details are shared.
+                    - listitem [ref=e433]:
+                      - strong [ref=e434]: "SOC 2:"
+                      - text: Our controls for data protection, access management, and monitoring will help satisfy SOC 2 requirements.
+              - paragraph [ref=e435]:
+                - strong [ref=e436]: "Risk Rating: Medium"
+              - paragraph [ref=e437]: The risk is medium because exposing internal operational details, even aggregated, could provide valuable intelligence to external threat actors or competitors if not properly secured. Insider threat is also a consideration if authorization isn't tightly controlled.
+              - paragraph [ref=e438]: "[After clarification]: Thanks for the additional detail. Knowing the specific data points and update frequency helps refine the security assessment."
+              - paragraph [ref=e439]: The dashboard's data, including sprint velocity and release dates, while not directly customer or critical infrastructure data, still represents sensitive internal operational information. Unauthorized access could expose team performance metrics and future project timelines, potentially impacting competitive advantage or internal planning. Therefore, strong access controls and data protection remain crucial.
+              - paragraph [ref=e440]: The daily API sync from Azure DevOps is a key integration point that requires secure configuration and monitoring.
+              - paragraph [ref=e441]: "Here's an updated look at the security considerations:"
+              - list [ref=e442]:
+                - listitem [ref=e443]:
+                  - strong [ref=e444]: "Authentication & Authorization:"
+                  - text: Absolutely, this must integrate with
+                  - strong [ref=e445]: Entra ID (formerly Azure AD)
+                  - text: . Role-based access control (RBAC) should be implemented to ensure only authorized ENMAX employees can view the dashboard, and potentially further restrict visibility based on job function if certain data is more sensitive.
+                - listitem [ref=e446]:
+                  - strong [ref=e447]: "Data Sensitivity & Handling:"
+                  - text: The data (sprint velocity, release dates) would be classified as
+                  - strong [ref=e448]: "\"Internal Use Only.\""
+                  - text: While not NERC CIP data, its exposure could still be detrimental. Data in transit (API sync) and at rest (dashboard storage) must be encrypted.
+                - listitem [ref=e449]:
+                  - strong [ref=e450]: "Network Security:"
+                  - text: The dashboard application and its backend (where data is stored) should reside within a secure Azure Virtual Network (VNet), protected by
+                  - strong [ref=e451]: Azure Firewall
+                  - text: and Network Security Groups (NSGs). Access to the API endpoint for daily updates must be highly restricted.
+                - listitem [ref=e452]:
+                  - strong [ref=e453]: "Azure Security Services:"
+                  - list [ref=e454]:
+                    - listitem [ref=e455]:
+                      - strong [ref=e456]: "Azure App Service/Container Apps:"
+                      - text: For hosting the dashboard, leveraging its built-in security features.
+                    - listitem [ref=e457]:
+                      - strong [ref=e458]: "Azure Key Vault:"
+                      - text: To securely store any API keys or connection strings needed for the Azure DevOps integration.
+                    - listitem [ref=e459]:
+                      - strong [ref=e460]: "Azure Monitor & Azure Sentinel:"
+                      - text: For logging, monitoring, and alerting on suspicious activities or access attempts.
+                    - listitem [ref=e461]:
+                      - strong [ref=e462]: "Microsoft Defender for Cloud:"
+                      - text: To provide continuous security posture management and threat protection for the Azure resources.
+                    - listitem [ref=e463]:
+                      - strong [ref=e464]: "Azure API Management:"
+                      - text: To secure and manage the API gateway for the Azure DevOps integration, enforcing policies and authentication.
+                - listitem [ref=e465]:
+                  - strong [ref=e466]: "Compliance Requirements:"
+                  - text: While not directly NERC CIP, general principles of
+                  - strong [ref=e467]: Alberta PIPA
+                  - text: regarding sensitive employee data (if team names are identifiable) and
+                  - strong [ref=e468]: SOC 2
+                  - text: for data integrity and confidentiality would apply. We'd need to ensure proper logging and audit trails are in place.
+                - listitem [ref=e469]:
+                  - strong [ref=e470]: "Risk Rating:"
+                  - strong [ref=e471]: Medium.
+                  - text: The risk isn't about critical infrastructure disruption, but rather the exposure of internal operational data, which could lead to reputational damage, competitive disadvantage, or internal misuse if not properly secured. The API integration adds a specific attack surface that needs careful attention.
+          - generic [ref=e474]:
+            - generic [ref=e475]: 🎨
+            - heading "Design & User Experience" [level=2] [ref=e477]
+          - generic [ref=e486]:
+            - generic [ref=e487]: ⚠️
+            - heading "Key Risks & Mitigations" [level=2] [ref=e489]
+          - generic [ref=e498]:
+            - generic [ref=e499]: 💰
+            - heading "Estimated Effort & Cost" [level=2] [ref=e501]

@@ -9,6 +9,11 @@ import {
   getSession,
   listSessions,
   getMessages,
+  createSpec,
+  getSpec,
+  updateSpec,
+  insertSpecVersion,
+  getSpecVersions,
 } from "./db.js";
 import { runEvaluation, personas, submitAnswer } from "./agents.js";
 
@@ -94,6 +99,84 @@ app.post("/api/sessions/:id/answer", (req, res) => {
   }
 
   res.json({ ok: true });
+});
+
+// Get spec for a session
+app.get("/api/sessions/:id/spec", (req, res) => {
+  const spec = getSpec.get(req.params.id) as Record<string, unknown> | undefined;
+  if (!spec) {
+    res.status(404).json({ error: "Spec not found" });
+    return;
+  }
+  res.json(spec);
+});
+
+// Create or update spec for a session
+app.put("/api/sessions/:id/spec", (req, res) => {
+  const { content, githubUrl } = req.body;
+  if (!content || typeof content !== "string") {
+    res.status(400).json({ error: "Content is required" });
+    return;
+  }
+
+  const existing = getSpec.get(req.params.id) as Record<string, unknown> | undefined;
+
+  if (existing) {
+    const newVersion = ((existing.version as number) || 1) + 1;
+    insertSpecVersion.run(
+      nanoid(),
+      existing.id,
+      existing.content as string,
+      (existing.version as number) || 1
+    );
+    updateSpec.run(content, githubUrl || null, req.params.id);
+    res.json({ ...existing, content, version: newVersion, github_url: githubUrl || null });
+  } else {
+    const id = nanoid();
+    createSpec.run(id, req.params.id, content, 1);
+    res.json({ id, session_id: req.params.id, content, version: 1, github_url: githubUrl || null });
+  }
+});
+
+// Download spec as markdown file
+app.get("/api/sessions/:id/spec/download", (req, res) => {
+  const spec = getSpec.get(req.params.id) as
+    | { session_id: string; content: string }
+    | undefined;
+  if (!spec) {
+    res.status(404).json({ error: "Spec not found" });
+    return;
+  }
+
+  const session = getSession.get(spec.session_id) as { idea: string } | undefined;
+  const idea = session?.idea ?? "Untitled";
+
+  const frontmatter = `---
+title: "ENMAX Spark — Project Specification"
+idea: "${idea.replace(/"/g, '\\"')}"
+date: ${new Date().toISOString().split("T")[0]}
+generator: ENMAX Spark
+---
+
+`;
+
+  res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="spark-spec-${req.params.id}.md"`
+  );
+  res.send(frontmatter + spec.content);
+});
+
+// Get spec version history
+app.get("/api/sessions/:id/spec/versions", (req, res) => {
+  const spec = getSpec.get(req.params.id) as { id: string } | undefined;
+  if (!spec) {
+    res.status(404).json({ error: "Spec not found" });
+    return;
+  }
+  const versions = getSpecVersions.all(spec.id);
+  res.json(versions);
 });
 
 // SSE stream for session evaluation

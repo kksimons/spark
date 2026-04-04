@@ -51,8 +51,38 @@ export interface DiscussionMsg {
 
 export interface SSEEvent {
   type: string;
+  id?: string;
   persona?: string;
   round?: number;
   content?: string;
   status?: string;
+  sections?: SpecSection[];
+}
+
+export interface SpecSection {
+  id: string;
+  title: string;
+  icon: string;
+  content: string;
+  order: number;
+  status?: "skeleton" | "writing" | "complete";
+  writingBy?: string;
+}
+
+export interface Spec {
+  id: string;
+  sessionId: string;
+  content: string;
+  sections: SpecSection[];
+  version: number;
+  updatedAt: string;
+  githubUrl?: string;
+}
+
+export interface SpecVersion {
+  id: string;
+  specId: string;
+  content: string;
+  version: number;
+  createdAt: string;
 }

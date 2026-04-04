@@ -200,6 +200,99 @@ function parseResponse(content: string): {
   return { assessment: content.trim(), question: null };
 }
 
+const SECTION_ID_MAP: Record<string, string> = {
+  verdict: "verdict",
+  stakeholder: "stakeholder",
+  departments: "departments",
+  approach: "approach",
+  architecture: "architecture",
+  security: "security",
+  design: "design",
+  risks: "risks",
+  effort: "effort",
+};
+
+function sectionIdForTitle(title: string): string {
+  const lower = title.toLowerCase();
+  for (const [key, id] of Object.entries(SECTION_ID_MAP)) {
+    if (lower.includes(key)) return id;
+  }
+  return `section-${title.toLowerCase().replace(/[^a-z0-9]/g, "-").slice(0, 20)}`;
+}
+
+function parseMarkdownSections(markdown: string): Array<{
+  id: string;
+  title: string;
+  content: string;
+  order: number;
+}> {
+  const lines = markdown.split("\n");
+  const sections: Array<{ id: string; title: string; content: string; order: number }> = [];
+  let currentTitle = "";
+  let currentContent: string[] = [];
+  let order = 0;
+
+  const flush = () => {
+    if (currentTitle) {
+      sections.push({
+        id: sectionIdForTitle(currentTitle),
+        title: currentTitle,
+        content: currentContent.join("\n").trim(),
+        order,
+      });
+      order++;
+    }
+  };
+
+  for (const line of lines) {
+    const match = line.match(/^# (.+)$/);
+    if (match) {
+      flush();
+      currentTitle = match[1].trim();
+      currentContent = [];
+    } else {
+      currentContent.push(line);
+    }
+  }
+  flush();
+
+  return sections;
+}
+
+const PERSONA_SECTION_MAP: Record<string, Array<{ id: string; title: string; order: number }>> = {
+  dayee: [
+    { id: "security", title: "Security & Compliance", order: 5 },
+  ],
+  nathan: [
+    { id: "architecture", title: "Technical Architecture", order: 4 },
+    { id: "effort", title: "Estimated Effort & Cost", order: 8 },
+  ],
+  dana: [
+    { id: "departments", title: "Departments Involved", order: 2 },
+    { id: "approach", title: "Recommended Approach", order: 3 },
+  ],
+  lalindra: [
+    { id: "design", title: "Design & User Experience", order: 6 },
+  ],
+  kyle: [
+    { id: "risks", title: "Key Risks & Mitigations", order: 7 },
+    { id: "architecture", title: "Technical Architecture", order: 4 },
+  ],
+};
+
+function getSpecContributions(
+  personaId: string,
+  assessment: string
+): Array<{ id: string; title: string; content: string; order: number }> {
+  const sectionDefs = PERSONA_SECTION_MAP[personaId];
+  if (!sectionDefs) return [];
+
+  return sectionDefs.map((def) => ({
+    ...def,
+    content: assessment,
+  }));
+}
+
 function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
@@ -250,6 +343,21 @@ export async function runEvaluation(
 ) {
   try {
     const agentResults: Record<string, string> = {};
+
+    onEvent({
+      type: "spec_skeleton",
+      sections: [
+        { id: "verdict", title: "Verdict", icon: "gavel", content: "", order: 0, status: "skeleton" },
+        { id: "stakeholder", title: "Stakeholder Outreach & Next Steps", icon: "users", content: "", order: 1, status: "skeleton" },
+        { id: "departments", title: "Departments Involved", icon: "building", content: "", order: 2, status: "skeleton" },
+        { id: "approach", title: "Recommended Approach", icon: "route", content: "", order: 3, status: "skeleton" },
+        { id: "architecture", title: "Technical Architecture", icon: "server", content: "", order: 4, status: "skeleton" },
+        { id: "security", title: "Security & Compliance", icon: "shield", content: "", order: 5, status: "skeleton" },
+        { id: "design", title: "Design & User Experience", icon: "palette", content: "", order: 6, status: "skeleton" },
+        { id: "risks", title: "Key Risks & Mitigations", icon: "alert-triangle", content: "", order: 7, status: "skeleton" },
+        { id: "effort", title: "Estimated Effort & Cost", icon: "dollar-sign", content: "", order: 8, status: "skeleton" },
+      ],
+    });
 
     // ── Round 1: Sequential individual assessments ──
     onEvent({ type: "round_start", round: 1 });
@@ -330,6 +438,30 @@ export async function runEvaluation(
       );
 
       onEvent({ type: "agent_done", persona: persona.id });
+
+      const specContributions = getSpecContributions(persona.id, agentResults[persona.id]);
+      for (const contrib of specContributions) {
+      onEvent({
+        type: "spec_section",
+        id: contrib.id,
+        title: contrib.title,
+        content: contrib.content,
+        order: contrib.order,
+        status: "writing",
+        round: 1,
+      });
+      await delay(300);
+      onEvent({
+        type: "spec_section",
+        id: contrib.id,
+        title: contrib.title,
+        content: contrib.content,
+        order: contrib.order,
+        status: "complete",
+        round: 1,
+      });
+      }
+
       await delay(600);
     }
 
@@ -385,7 +517,7 @@ export async function runEvaluation(
       .map((p, i) => `**${p.name} (${p.department}):** ${discussionResults[i]}`)
       .join("\n\n");
 
-    const synthesisPrompt = `You are the ENMAX Spark Orchestrator. Synthesize this team evaluation into a clear, actionable plan.
+    const synthesisPrompt = `You are the ENMAX Spark Orchestrator. Create a comprehensive, actionable specification document from this team evaluation.
 
 The idea: "${idea}"
 
@@ -395,19 +527,81 @@ ${round1Summary}
 Cross-discussion:
 ${round2Summary}
 
-Create a final synthesis with:
-1. **Verdict** — Go / Go with Conditions / Needs More Research / Not Recommended
-2. **Executive Summary** — 2-3 sentences
-3. **Departments Involved** — Teams and their responsibilities
-4. **Recommended Approach** — Phased plan with milestones
-5. **Key Risks & Mitigations** — Top 3-5 risks
-6. **Estimated Effort & Cost** — High-level sizing
-7. **Immediate Next Steps** — Next 2 weeks
+Generate a spec document using EXACTLY these markdown headers in this order. Each section must be substantive and actionable.
 
-Format with markdown headers. Be decisive and actionable.`;
+# Verdict
+
+State the overall recommendation: **Go**, **Go with Conditions**, **Needs More Research**, or **Not Recommended**. Then write a 2-3 sentence executive summary explaining why, in plain language a VP could understand.
+
+# Stakeholder Outreach & Next Steps
+
+This is the most actionable section — write it for a project manager or product owner who needs to know WHO to talk to and WHAT to do next week.
+
+For each department involved, list:
+- **Department name** — The specific ENMAX team to engage
+- **Recommended contact** — Suggest reaching out to the real counterpart in that department (referencing the role like "Security Analyst in Cybersecurity", "Infrastructure & Platform Lead in Digital Experience", "Solutions Architect in Enterprise Architecture", "UX/UI Designer in Design", "Software Engineer in Engineering"). Write it as "Reach out to the [Role] in [Department]" format.
+- **What to discuss** — 1-2 sentences on the specific topics to raise with them
+- **Priority** — High / Medium / Low for when to engage them
+
+Then list the **Immediate Actions** (numbered, concrete steps for the next 1-2 weeks):
+1. Specific action with owner and timeline
+2. etc.
+
+And **Upcoming Milestones** (what should happen in weeks 2-4, 4-8, 8-12).
+
+# Departments Involved
+
+List each department, their role in the project, and key responsibilities. Use a table format:
+
+| Department | Role | Key Responsibilities |
+|---|---|---|
+| ... | ... | ... |
+
+# Recommended Approach
+
+Detail a phased delivery plan:
+- **Phase 1: Discovery & Design** (timeline, deliverables, team)
+- **Phase 2: MVP Build** (timeline, deliverables, team)
+- **Phase 3: Launch & Iterate** (timeline, deliverables, team)
+
+Include decision gates between phases.
+
+# Technical Architecture
+
+Recommended tech stack, architecture pattern (monolith, microservices, serverless), key Azure services, and integration points. Include:
+- Tech stack with justification
+- Architecture diagram description
+- Key technical challenges and mitigations
+- AI/ML components if applicable
+
+# Security & Compliance
+
+Authentication approach, data classification, compliance requirements (NERC CIP, PIPA, SOC 2), specific Azure security services to use, and risk rating with justification.
+
+# Design & User Experience
+
+Key personas, critical user flows, accessibility requirements, recommended design approach, and UI framework. Include specific UX considerations for ENMAX's user base (field workers, business users).
+
+# Key Risks & Mitigations
+
+Top 5 risks in a table:
+
+| # | Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|---|
+| 1 | ... | ... | ... | ... |
+
+# Estimated Effort & Cost
+
+Break down by phase:
+- Development effort (t-shirt sizing: S/M/L/XL) per phase
+- Infrastructure costs (monthly range) per phase
+- Licensing implications
+- Total estimated range
+
+Be decisive, specific, and actionable throughout. Use concrete numbers, dates, and names of Azure services. Format everything with clean markdown.`;
 
     const synthesis = await callOpenRouter(
-      "You are a strategic technology advisor at ENMAX synthesizing expert evaluations into clear, actionable plans for non-technical stakeholders.",
+      "You are a strategic technology advisor at ENMAX creating comprehensive, actionable specification documents from expert evaluations. You write for both technical and non-technical stakeholders. Be specific, decisive, and include concrete next steps with real department contacts.",
       synthesisPrompt,
       apiKey
     );
@@ -424,6 +618,20 @@ Format with markdown headers. Be decisive and actionable.`;
     updateSession.run("complete", synthesis, sessionId);
 
     onEvent({ type: "synthesis", round: 3, content: synthesis });
+
+    const parsedSections = parseMarkdownSections(synthesis);
+    for (const section of parsedSections) {
+      onEvent({
+        type: "spec_section",
+        id: section.id,
+        title: section.title,
+        content: section.content,
+        order: section.order,
+        status: "complete",
+      });
+      await delay(400);
+    }
+
     onEvent({ type: "round_complete", round: 3 });
     onEvent({ type: "evaluation_complete", status: "complete" });
   } catch (error) {

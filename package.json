@@ -10,7 +10,9 @@
     "start": "NODE_ENV=production tsx server/index.ts",
     "db:reset": "rm -f data/spark.db && echo 'Database reset'",
     "lint": "oxlint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",
@@ -30,6 +32,7 @@
     "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4.0.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/better-sqlite3": "^7.6.13",

@@ -31,6 +31,25 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (session_id) REFERENCES sessions(id)
   );
+
+  CREATE TABLE IF NOT EXISTS specs (
+    id TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL UNIQUE,
+    content TEXT NOT NULL,
+    version INTEGER DEFAULT 1,
+    github_url TEXT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (session_id) REFERENCES sessions(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS spec_versions (
+    id TEXT PRIMARY KEY,
+    spec_id TEXT NOT NULL,
+    content TEXT NOT NULL,
+    version INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (spec_id) REFERENCES specs(id)
+  );
 `);
 
 export const createSession = db.prepare(
@@ -49,6 +68,20 @@ export const insertMessage = db.prepare(
 );
 export const getMessages = db.prepare(
   "SELECT * FROM messages WHERE session_id = ? ORDER BY round ASC, created_at ASC"
+);
+
+export const createSpec = db.prepare(
+  "INSERT INTO specs (id, session_id, content, version) VALUES (?, ?, ?, ?)"
+);
+export const getSpec = db.prepare("SELECT * FROM specs WHERE session_id = ?");
+export const updateSpec = db.prepare(
+  "UPDATE specs SET content = ?, version = version + 1, github_url = ?, updated_at = CURRENT_TIMESTAMP WHERE session_id = ?"
+);
+export const insertSpecVersion = db.prepare(
+  "INSERT INTO spec_versions (id, spec_id, content, version) VALUES (?, ?, ?, ?)"
+);
+export const getSpecVersions = db.prepare(
+  "SELECT * FROM spec_versions WHERE spec_id = ? ORDER BY version DESC"
 );
 
 export default db;
