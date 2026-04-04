@@ -1,4 +1,3 @@
-import Database from "better-sqlite3";
 import path from "path";
 import fs from "fs";
 
@@ -7,7 +6,41 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const db = new Database(path.join(dataDir, "spark.db"));
+interface PreparedStmt {
+  run: (...args: unknown[]) => unknown;
+  get: (...args: unknown[]) => Record<string, unknown> | undefined;
+  all: (...args: unknown[]) => Record<string, unknown>[];
+}
+
+interface Db {
+  pragma(pragma: string): unknown;
+  exec(sql: string): unknown;
+  prepare(sql: string): PreparedStmt;
+}
+
+let db: Db;
+
+const isBun = typeof (globalThis as Record<string, unknown>).Bun !== "undefined";
+
+if (isBun) {
+  const { Database: BunDb } = await import("bun:sqlite" as string);
+  const raw = new (BunDb as new (path: string) => { exec(s: string): unknown; prepare(s: string): { run(...a: unknown[]): unknown; get(...a: unknown[]): unknown; all(...a: unknown[]): unknown[] } })(path.join(dataDir, "spark.db"));
+  db = {
+    pragma: (p) => raw.exec(`PRAGMA ${p}`),
+    exec: (s) => raw.exec(s),
+    prepare: (s) => {
+      const stmt = raw.prepare(s);
+      return {
+        run: (...a) => stmt.run(...a),
+        get: (...a) => stmt.get(...a) as Record<string, unknown> | undefined,
+        all: (...a) => stmt.all(...a) as Record<string, unknown>[],
+      };
+    },
+  };
+} else {
+  const Database = (await import("better-sqlite3")).default;
+  db = new Database(path.join(dataDir, "spark.db")) as unknown as Db;
+}
 
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");

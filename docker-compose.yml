@@ -1,0 +1,28 @@
+services:
+  spark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spark
+    restart: unless-stopped
+    networks:
+      - proxy
+    env_file:
+      - ../.env
+    volumes:
+      - spark-data:/app/data
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.spark.rule=Host(`spark.kylesimons.ca`)
+      - traefik.http.routers.spark.entrypoints=websecure
+      - traefik.http.routers.spark.tls.certresolver=cloudflare
+      - traefik.http.routers.spark.middlewares=secure-chain@file
+      - traefik.http.services.spark.loadbalancer.server.port=3001
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  spark-data:
