@@ -5,18 +5,6 @@ const TIMEOUT = 180_000;
 const DEFAULT_ANSWER =
   "The primary users are internal employees across all departments. We expect moderate usage with some sensitive data. It should integrate with our existing Microsoft ecosystem.";
 
-const SPEC_SECTION_IDS = [
-  "verdict",
-  "stakeholder",
-  "departments",
-  "approach",
-  "architecture",
-  "security",
-  "design",
-  "risks",
-  "effort",
-] as const;
-
 async function dismissQuestions(page: Page, answer?: string) {
   const questionInput = page.locator(
     "input[placeholder='Type your answer...']",

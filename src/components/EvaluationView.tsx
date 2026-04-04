@@ -7,7 +7,7 @@ import { CompletedAgentRow } from "./CompletedAgentRow";
 import { DiscussionSection } from "./DiscussionSection";
 import { SynthesisCard } from "./SynthesisCard";
 import { SpecDocument } from "./SpecDocument";
-import { FileText, X, Sparkles } from "lucide-react";
+import { FileText, X, Sparkles, ChevronUp } from "lucide-react";
 
 interface EvaluationViewProps {
   session: Session;
@@ -160,16 +160,16 @@ export function EvaluationView({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/20 z-40"
+              className="fixed inset-0 bg-black/20 z-40 sm:bg-black/20 bg-black/40"
               onClick={() => setSpecOpen(false)}
             />
             <motion.div
               key="drawer"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed right-0 top-0 bottom-0 w-full sm:w-[520px] md:w-[600px] lg:w-[680px] bg-white shadow-2xl z-50 flex flex-col"
+              className="fixed inset-x-0 bottom-0 top-[env(safe-area-inset-top,0px)] sm:inset-x-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-[520px] md:w-[600px] lg:w-[680px] bg-white shadow-2xl z-50 flex flex-col rounded-t-2xl sm:rounded-none"
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-border/40 shrink-0">
                 <div className="flex items-center gap-2">
@@ -190,7 +190,8 @@ export function EvaluationView({
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto">
+
+              <div className="flex-1 overflow-y-auto overscroll-contain">
                 <SpecDocument
                   sessionId={session.id}
                   idea={session.idea}
@@ -227,10 +228,10 @@ function FloatingSpecButton({
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.5 }}
       onClick={onClick}
-      className="fixed bottom-6 right-6 z-30 flex items-center gap-2.5 pl-4 pr-5 py-3 bg-white border border-border/60 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_32px_rgba(0,0,0,0.16)] transition-shadow"
+      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-auto z-30 flex items-center sm:justify-start gap-2.5 pl-3 sm:pl-4 sm:pr-5 py-3.5 sm:py-3 bg-white border border-border/60 rounded-2xl sm:rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_32px_rgba(0,0,0,0.16)] active:scale-[0.98] transition-all"
       data-testid="spec-fab"
     >
-      <div className="relative w-8 h-8">
+      <div className="relative w-8 h-8 shrink-0">
         <svg className="w-8 h-8 -rotate-90" viewBox="0 0 32 32">
           <circle
             cx="16"
@@ -261,21 +262,34 @@ function FloatingSpecButton({
           )}
         </div>
       </div>
+
       <div className="text-left">
-        <p className="text-[12px] font-semibold text-foreground leading-none">
-          {isComplete ? "View Spec" : "Spec"}
+        <p className="text-[13px] sm:text-[12px] font-semibold text-foreground leading-none">
+          {isComplete ? "View Spec" : "Spec Progress"}
         </p>
-        <p className="text-[10px] text-muted-foreground mt-0.5">
-          {isComplete ? "Ready to edit" : `${filledCount}/${totalCount} sections`}
+        <p className="text-[11px] sm:text-[10px] text-muted-foreground mt-0.5">
+          {isComplete ? "Ready to edit & share" : `${filledCount}/${totalCount} sections filled`}
         </p>
       </div>
-      {!isOpen && filledCount < totalCount && (
+
+      <div className="hidden sm:block">
+        {!isOpen && filledCount < totalCount && (
+          <motion.div
+            className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+        )}
+      </div>
+
+      <div className="sm:hidden ml-auto mr-2 flex items-center text-accent">
         <motion.div
-          className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full"
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
-      )}
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronUp className="w-5 h-5" />
+        </motion.div>
+      </div>
     </motion.button>
   );
 }
