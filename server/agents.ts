@@ -17,7 +17,9 @@ const QUESTION_INSTRUCTION = `
 If the idea is vague or you need more information to give a thorough assessment, you may ask ONE clarifying question. Place it at the very end of your response on its own line starting with "QUESTION_FOR_USER:" — for example:
 QUESTION_FOR_USER: Could you tell me more about who the primary users would be?
 
-Only ask if it would meaningfully improve your assessment. Keep your main assessment concise (under 250 words).`;
+IMPORTANT: Do NOT ask a question that has already been asked by a colleague earlier in this session. Build on what has already been discussed. If a similar question was asked and answered, reference that information and ask something new that digs deeper into YOUR domain expertise. If the existing answers give you enough to work with, skip the question entirely.
+
+Only ask if it would meaningfully improve your assessment and has NOT already been covered. Keep your main assessment concise (under 250 words).`;
 
 export const personas: Persona[] = [
   {
@@ -293,6 +295,32 @@ function getSpecContributions(
   }));
 }
 
+export function buildRound1Prompt(
+  idea: string,
+  personaIndex: number,
+  allPersonas: Persona[],
+  agentResults: Record<string, string>,
+  qaHistory: Array<{ agentName: string; question: string; answer: string }>
+): string {
+  const persona = allPersonas[personaIndex];
+
+  let priorContext = "";
+  if (personaIndex > 0) {
+    const priorAssessments = allPersonas.slice(0, personaIndex)
+      .map((p) => `**${p.name} (${p.department}):** ${agentResults[p.id]}`)
+      .join("\n\n---\n\n");
+    priorContext = `\n\nHere are the assessments from colleagues who have already evaluated this idea:\n\n${priorAssessments}`;
+  }
+  if (qaHistory.length > 0) {
+    const qaBlock = qaHistory
+      .map((qa) => `- ${qa.agentName} asked: "${qa.question}" → User answered: "${qa.answer}"`)
+      .join("\n");
+    priorContext += `\n\nClarifying questions already asked and answered:\n${qaBlock}\n\nUse the above information in your assessment. Do NOT repeat points already made or ask about topics already covered. Focus on your unique domain perspective and add new insights.`;
+  }
+
+  return `A colleague at ENMAX has proposed the following idea:\n\n"${idea}"\n\nPlease evaluate this idea from your perspective as ${persona.role} in ${persona.department}. What are the key considerations, recommendations, and potential concerns?${priorContext}`;
+}
+
 function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
@@ -362,6 +390,8 @@ export async function runEvaluation(
     // ── Round 1: Sequential individual assessments ──
     onEvent({ type: "round_start", round: 1 });
 
+    const qaHistory: Array<{ agentName: string; question: string; answer: string }> = [];
+
     for (let i = 0; i < personas.length; i++) {
       const persona = personas[i];
 
@@ -372,7 +402,7 @@ export async function runEvaluation(
       // Thinking
       onEvent({ type: "agent_thinking", persona: persona.id });
 
-      const prompt = `A colleague at ENMAX has proposed the following idea:\n\n"${idea}"\n\nPlease evaluate this idea from your perspective as ${persona.role} in ${persona.department}. What are the key considerations, recommendations, and potential concerns?`;
+      const prompt = buildRound1Prompt(idea, i, personas, agentResults, qaHistory);
 
       const rawContent = await callOpenRouter(
         persona.systemPrompt,
@@ -406,6 +436,8 @@ export async function runEvaluation(
           persona: persona.id,
           content: userAnswer,
         });
+
+        qaHistory.push({ agentName: persona.name, question, answer: userAnswer });
 
         // Get a refined take with the answer
         onEvent({ type: "agent_thinking", persona: persona.id });

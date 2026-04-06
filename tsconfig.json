@@ -8,6 +8,7 @@
     "target": "ES2022",
     "moduleResolution": "bundler",
     "skipLibCheck": true,
+    "types": ["bun-types"],
     "paths": {
       "@/*": ["./src/*"]
     },
