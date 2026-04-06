@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { insertMessage, updateSession } from "./db.js";
+import { insertMessage, updateSession, createSpec } from "./db.js";
 
 const MODEL = "google/gemini-2.5-flash";
 
@@ -648,6 +648,7 @@ Be decisive, specific, and actionable throughout. Use concrete numbers, dates, a
     );
 
     updateSession.run("complete", synthesis, sessionId);
+    createSpec.run(nanoid(), sessionId, synthesis, 1);
 
     onEvent({ type: "synthesis", round: 3, content: synthesis });
 
