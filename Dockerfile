@@ -1,4 +1,4 @@
-FROM oven/bun:1.3.11 AS build
+FROM oven/bun:1.4.2 AS build
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y python3 make g++ libsqlite3-dev && rm -rf /var/lib/apt/lists/*
@@ -8,7 +8,7 @@ RUN bun install --frozen-lockfile
 COPY . .
 RUN bun run build
 
-FROM oven/bun:1.3.11 AS release
+FROM oven/bun:1.4.2 AS release
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y python3 make g++ libsqlite3-dev && rm -rf /var/lib/apt/lists/*
